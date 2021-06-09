@@ -1,0 +1,60 @@
+module.exports = (sequelize, DataTypes) => {
+  const medicoUser = sequelize.define('medicoUser', {
+    nombres: {
+      type: DataTypes.STRING,
+      allowNull: {
+        args: false,
+        msg: 'Inserte nombre por favor'
+      }
+    },
+    apellidos: {
+      type: DataTypes.STRING,
+      allowNull: {
+        args: false,
+        msg: 'Inserte apellido por favor'
+      }
+    },
+    ci: {
+      type: DataTypes.STRING,
+      allowNull: {
+        args: false,
+        msg: 'Inserte C.I. por favor'
+      }
+    },
+    email: {
+      type: DataTypes.STRING,
+    },
+    telefono:{
+      type:DataTypes.INTEGER,
+      allowNull: {
+        args: false,
+        msg: 'Inserte telefono por favor'
+      }
+    },
+    direccion: {
+      type: DataTypes.STRING,
+      allowNull: {
+        args: false,
+        msg: 'Direccion es obligatorio'
+      }
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: {
+        args: false,
+        msg: 'La contracenia es obligatorio'
+      }
+    },
+    
+  }, {});
+  medicoUser.associate = (models) => {
+    // associations can be defined here
+    medicoUser.hasMany(models.paciente, {
+      foreignKey: 'id_medico',
+    });
+    medicoUser.hasMany(models.consulta, {
+      foreignKey: 'id_medico',
+    });
+  };
+  return medicoUser;
+};
