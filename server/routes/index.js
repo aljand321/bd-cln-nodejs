@@ -1,6 +1,8 @@
 import Users from "../controllers/user";
 import Books from "../controllers/book";
 
+import MedicoUser from '../controllers/MedicoUser';
+
 export default (app) => {
   app.get("/api", (req, res) =>
     res.status(200).send({
@@ -13,6 +15,13 @@ export default (app) => {
   app.get("/api/books", Books.list); // API route for user to get all books in the database
   app.put("/api/books/:bookId", Books.modify); // API route for user to edit a book
   app.delete("/api/books/:bookId", Books.delete); // API route for user to delete a book
+
+  //medico user
+  app.post('/api/medico', MedicoUser.create);
+  app.get('/api/medico', MedicoUser.list);
+  app.get('/api/medico/:id_medico', MedicoUser.oneUser);
+  app.put('/api/medico/:id_medico', MedicoUser.updateUser);
+  app.delete('/api/deleteMEdico/:id_user', MedicoUser.deleteUser)
 };
 
 

@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       menarca: {
-        type: Sequelize.NUMBER
+        type: Sequelize.DECIMAL
       },
       ritmo: {
         type: Sequelize.STRING
