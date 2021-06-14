@@ -1,25 +1,30 @@
-    //import http from 'http';
-    import express from 'express';
-    import morgan from 'morgan';
-    import routes from './routes';
+//import http from 'http';
+import express from "express";
+import morgan from "morgan";
+import routes from "./routes";
+var cors = require("cors");
 
-    /* const hostname = '127.0.0.1';
-    const port = 3000;
-     */ // setup express application
-    const app = express()
-    app.set('port', process.env.PORT || 3000)
+const Authtoken = require('./midleware/Token');
 
-    app.use(morgan('dev')); // log requests to the console
+const app = express();
+app.set("port", process.env.PORT || 3001);
 
-    // Parse incoming requests data
-    app.use(express.json());
-    app.use(express.urlencoded({extended:false}));
+app.use(morgan("dev")); // log requests to the console
 
-    routes(app);
-    app.get('*', (req, res) => res.status(200).send({
-      message: 'Welcome to the default API route',
-    }));
+// Parse incoming requests data
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
-    app.listen(app.get('port'), () => {
-        console.log('Server on port', app.get('port'));
-    })
+//auth token
+app.use(Authtoken);
+routes(app);
+app.get("*", (req, res) =>
+  res.status(200).send({
+    message: "Welcome to the default API route",
+  })
+);
+
+app.listen(app.get("port"), () => {
+  console.log("Server on port", app.get("port"));
+});

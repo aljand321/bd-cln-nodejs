@@ -2,6 +2,7 @@ import Users from "../controllers/user";
 import Books from "../controllers/book";
 
 import MedicoUser from '../controllers/MedicoUser';
+import Login from '../controllers/Login';
 
 export default (app) => {
   app.get("/api", (req, res) =>
@@ -18,10 +19,13 @@ export default (app) => {
 
   //medico user
   app.post('/api/medico', MedicoUser.create);
+  app.get('/api/getList', MedicoUser.getList);
   app.get('/api/medico', MedicoUser.list);
   app.get('/api/medico/:id_medico', MedicoUser.oneUser);
   app.put('/api/medico/:id_medico', MedicoUser.updateUser);
   app.delete('/api/deleteMEdico/:id_user', MedicoUser.deleteUser)
+
+  app.post('/api/login', Login.login);
 };
 
 

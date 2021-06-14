@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 module.exports = (sequelize, DataTypes) => {
   const medicoUser = sequelize.define('medicoUser', {
     nombres: {
@@ -45,8 +46,28 @@ module.exports = (sequelize, DataTypes) => {
         msg: 'La contracenia es obligatorio'
       }
     },
+    role:{
+      type:DataTypes.STRING,
+      allowNull: {
+        args: false,
+        msg: 'Rol del usario es obligatorio'
+      }
+    },
     
   }, {});
+  medicoUser.beforeSave((user, options) => {
+    if(user.changed('password')){
+      user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10), null)
+    }
+  })
+  medicoUser.prototype.comparePassword = function (passw, cb){
+    bcrypt.compare(passw, this.password, function(err, isMatch){
+      if (err){
+        return cb(err);
+      }
+      cb(null, isMatch)
+    })
+  }
   medicoUser.associate = (models) => {
     // associations can be defined here
     medicoUser.hasMany(models.paciente, {

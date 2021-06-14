@@ -6,10 +6,14 @@ const { medicoUser } = model;
 
 class MedicoUser {
     static async create (req,res){
-        const { nombres,apellidos,ci,email,telefono,direccion,password,password1 } =  req.body;
-        const verifyDatas = await validateDatas(nombres,apellidos,ci,email,telefono,direccion,password,password1);
+        const { nombres,apellidos,ci,email,telefono,direccion,password,password1,role } =  req.body;
+        const verifyDatas = await validateDatas(nombres,apellidos,ci,email,telefono,direccion,password,password1,role);
         //console.log(verifyDatas, ' esto es lo que quiero ver')
-        if(verifyDatas.success == false)return res.status(400).json(verifyDatas)
+        if(verifyDatas.success == false)return res.status(200).json(verifyDatas)
+        /* res.status(200).json({
+            success:true,
+            msg:"Se creo un usario",
+        }) */
         try {
             const resp = await medicoUser.create({
                 nombres,
@@ -18,7 +22,8 @@ class MedicoUser {
                 email,
                 telefono,
                 direccion,
-                password
+                password,
+                role
             });
             res.status(200).json({
                 success:true,
@@ -121,8 +126,23 @@ class MedicoUser {
             res.status(500),json(error)
         }
     }
+    static async getList(req,res){
+        try {
+            const resp = await medicoUser.findAll();
+            if(resp.length > 0 )return res.status(200).json({
+                success:true,
+                msg:"Existe almenos un usuario",
+            })
+            return res.status(200).json({
+                success:false,
+                msg:"No existe usarios"
+            })
+        } catch (error) {
+            res.status(500),json(error)
+        }
+    }
 }
-async function validateDatas(nombres,apellidos,ci,email,telefono,direccion,password,password1){
+async function validateDatas(nombres,apellidos,ci,email,telefono,direccion,password,password1,role){
     if(!nombres)return {success:false,msg:"Nombre del medico es obligatorio"};
     if(!apellidos)return {success:false,msg:"Apellido del medico es obligatorio"};
     if(!ci)return {success:false,msg:"C.I. es obligatorio"};
@@ -131,7 +151,9 @@ async function validateDatas(nombres,apellidos,ci,email,telefono,direccion,passw
     if(!direccion)return {success:false,msg:"Direccion es obligatorio"};
     if(!password)return {success:false,msg:"Contracenia es obligatorio"};
     if(!password1)return {success:false,msg:"Contracenia de confirmacion es obligatorio"};
+    if(!role)return {success:false,msg:"Rol del usario es obligatorio"};
     if(password != password1)return {success:false, msg:"las contracenias no son iguales"};
+    
     const validate = await verify(ci,email,telefono);
     if(validate.success == false)return validate;
     return {success:true,msg:"continuar"};
