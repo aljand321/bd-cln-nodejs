@@ -26,6 +26,15 @@ module.exports = {
       direccion: {
         type: Sequelize.STRING
       },
+      edad: {
+        type: Sequelize.DATE
+      },
+      especialidad:{
+        type: Sequelize.STRING
+      },
+      img:{
+        type:Sequelize.STRING
+      },
       password: {
         type: Sequelize.STRING
       },

@@ -1,5 +1,6 @@
 import model from '../models';
 const { medicoUser } = model;
+const { paciente } = model;
 const jwt = require('jsonwebtoken');
 const config = require('../dataConfig');
 
@@ -42,6 +43,18 @@ class Login {
         } catch (error) {
             res.status(500).json(error);
         }
+    }
+    static async verifyToken (req,res){
+        res.status(200).json({
+            success:true,
+            msg:"tienes permiso"
+        })
+        /* try {
+           const resp = await paciente.findAll();
+           
+        } catch (error) {
+            res.status(500).json(error)
+        } */
     }
 }
 

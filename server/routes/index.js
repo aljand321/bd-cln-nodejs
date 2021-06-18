@@ -19,6 +19,7 @@ export default (app) => {
 
   //medico user
   app.post('/api/medico', MedicoUser.create);
+  app.post('/api/createMedico', MedicoUser.create);
   app.get('/api/getList', MedicoUser.getList);
   app.get('/api/medico', MedicoUser.list);
   app.get('/api/medico/:id_medico', MedicoUser.oneUser);
@@ -26,6 +27,7 @@ export default (app) => {
   app.delete('/api/deleteMEdico/:id_user', MedicoUser.deleteUser)
 
   app.post('/api/login', Login.login);
+  app.get('/api/verifyToken', Login.verifyToken);
 };
 
 

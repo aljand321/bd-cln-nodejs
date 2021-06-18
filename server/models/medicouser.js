@@ -39,6 +39,15 @@ module.exports = (sequelize, DataTypes) => {
         msg: 'Direccion es obligatorio'
       }
     },
+    edad:{
+      type:DataTypes.DATE,
+    },
+    especialidad:{
+      type:DataTypes.STRING,
+    },
+    img:{
+      type:DataTypes.STRING,
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: {

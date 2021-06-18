@@ -5,14 +5,15 @@ const config = require('../dataConfig');
 module.exports = async function(req,res,next){
     const ruta = req.path, method = req.method;
     const headerToken = req.headers.c_token
-   
+    console.log(headerToken, ' sssssssssssssssssssssssssssssss')
     if(headerToken){
         const token = headerToken.split(' ')[1];
         const verifyToken = await validateToken(token);
-        //console.log(verifyToken)
+        console.log(verifyToken)
         if(verifyToken.success == false)return res.status(400).json(verifyToken);
         next();
     }else{
+        console.log('no hay token sssssssssssssssssssssssss')
         const permisos = await tokenNull(ruta, method);
         if(permisos.success == false) return res.status(400).json(permisos);
         next();
