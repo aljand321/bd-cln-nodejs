@@ -28,6 +28,7 @@ export default (app) => {
 
   app.post('/api/login', Login.login);
   app.get('/api/verifyToken', Login.verifyToken);
+
 };
 
 

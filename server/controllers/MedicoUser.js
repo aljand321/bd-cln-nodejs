@@ -73,7 +73,9 @@ class MedicoUser {
     }
     static async list(req,res){
         try {
-            const resp = await medicoUser.findAll();
+            const resp = await medicoUser.findAll({
+                attributes:['id','nombres','apellidos','ci','email','telefono','direccion','edad','especialidad','img']
+            });
             res.status(200).json({
                 success:true,
                 msg:"Lista de usuarios",
@@ -84,10 +86,13 @@ class MedicoUser {
         }
     }
     static async oneUser(req,res){
-        const { id_user } = req.params;
+       
+        const { id_medico } = req.params;
+       
         try {
             const resp = await medicoUser.findOne({
-                where:{id:id_user}
+                where:{id:id_medico},
+                attributes:['id', 'nombres','apellidos','ci','email','telefono','direccion','edad','especialidad','role']
             });
             if(resp)return res.status(200).json({
                 success:true,
@@ -99,6 +104,7 @@ class MedicoUser {
                 msg:"No exite usario"
             })
         } catch (error) {
+            //console.log (error)
             return res.status(500).json(error)
         }
     }
