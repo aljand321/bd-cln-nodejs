@@ -21,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
         msg: 'Seleccione sexo por favor'
       }
     },
+    ci: {
+      type: DataTypes.STRING
+    },      
+    telefono: {
+      type: DataTypes.STRING
+    },
     direccion: {
       type: DataTypes.STRING,
       allowNull: {

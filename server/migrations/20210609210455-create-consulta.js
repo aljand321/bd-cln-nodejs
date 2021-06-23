@@ -17,9 +17,6 @@ module.exports = {
       signosVitales: {
         type: Sequelize.JSON
       },
-      examenFisoco: {
-        type: Sequelize.JSON
-      },
       id_paciente: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',

@@ -3,7 +3,8 @@ import Books from "../controllers/book";
 
 import MedicoUser from '../controllers/MedicoUser';
 import Login from '../controllers/Login';
-
+import Paciente from "../controllers/Paciente";
+import Consultas from '../controllers/Consultas';
 export default (app) => {
   app.get("/api", (req, res) =>
     res.status(200).send({
@@ -28,6 +29,17 @@ export default (app) => {
 
   app.post('/api/login', Login.login);
   app.get('/api/verifyToken', Login.verifyToken);
+
+  //paciente
+  app.post('/api/paciente/:id_medico',Paciente.create);
+  app.get('/api/pacientes',Paciente.list);
+  app.post('/api/buscarPaciente', Paciente.buscarPaciente);
+  app.post('/api/pagination/', Paciente.pagination);
+  app.get('/api/onePaciente/:id_paciente', Paciente.onePaciente)
+
+  //consulta paciente
+  app.post('/api/consulta/:id_paciente/:id_medico', Consultas.create);
+  app.get('/api/consutla/:id_paciente', Consultas.consultaPaciente);
 
 };
 

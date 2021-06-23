@@ -1,28 +1,44 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class consulta extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
-  };
-  consulta.init({
+  const consulta = sequelize.define('consulta', {
     motivo: DataTypes.TEXT,
     enfermedadActual: DataTypes.TEXT,
-    signosVitales: DataTypes.JSON,
-    examenFisoco: DataTypes.JSON,
-    id_paciente: DataTypes.INTEGER,
-    id_medico: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'consulta',
-  });
+    signosVitales: DataTypes.JSON,    
+    
+    id_paciente: {
+      type: DataTypes.INTEGER,
+      allowNull: {
+        args: false,
+        msg: 'No se esta mandando el id del paciente'
+      },
+      references: {
+        model: 'paciente',
+        key: 'id',
+        as: 'id_paciente',
+      }
+    },
+    id_medico: {
+      type: DataTypes.INTEGER,
+      allowNull: {
+        args: false,
+        msg: 'No se esta mandando el id del medico'
+      },
+      references: {
+        model: 'medicoUser',
+        key: 'id',
+        as: 'id_medico',
+      }
+    }
+  }, {});
+  consulta.associate = (models) => {
+    // associations can be defined here
+    consulta.belongsTo(models.paciente, {
+      foreignKey: 'id_paciente',
+      onDelete: 'CASCADE'
+    });
+    consulta.belongsTo(models.medicoUser, {
+      foreignKey: 'id_medico',
+      onDelete: 'CASCADE'
+    });
+  };
   return consulta;
 };

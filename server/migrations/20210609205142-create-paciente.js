@@ -15,7 +15,13 @@ module.exports = {
         type: Sequelize.STRING
       },
       sexo: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.STRING
+      },
+      ci: {
+        type: Sequelize.STRING
+      },      
+      telefono: {
+        type: Sequelize.STRING
       },
       direccion: {
         type: Sequelize.STRING
