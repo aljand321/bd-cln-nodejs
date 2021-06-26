@@ -64,6 +64,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   paciente.associate = (models) => {
     // associations can be defined here
+    
     paciente.hasMany(models.consulta, {
       foreignKey: 'id_paciente',
     });
@@ -76,11 +77,28 @@ module.exports = (sequelize, DataTypes) => {
     paciente.hasMany(models.antcPersonalesNoPtl, {
       foreignKey: 'id_paciente',
     });
-    paciente.hasMany(models.antcPersonalesPtl, {
-      foreignKey: 'id_paciente',
-    });
     paciente.hasMany(models.inmunizaciones, {
       foreignKey: 'id_paciente',
+    });
+    paciente.belongsToMany(models.alergias,{
+      through:'algPaciente',
+      as: 'alergias',
+      foreignKey:'id_paciente'
+    });
+    paciente.belongsToMany(models.transfuciones,{
+      through:'trPaciente',
+      as: 'transfuciones',
+      foreignKey:'id_paciente'
+    });
+    paciente.belongsToMany(models.cirugiasPrevias,{
+      through:'crPaciente',
+      as: 'cirugiasPrevias',
+      foreignKey:'id_paciente'
+    });
+    paciente.belongsToMany(models.OtrasEnfermedades,{
+      through:'otrasEnfPaciente',
+      as: 'OtrasEnfermedades',
+      foreignKey:'id_paciente'
     });
     paciente.belongsTo(models.medicoUser, {
       foreignKey: 'id_medico',

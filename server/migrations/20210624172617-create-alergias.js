@@ -1,32 +1,26 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('antcPersonalesPtls', {
+    await queryInterface.createTable('alergias', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      alergias: {
+      nombre: {
         type: Sequelize.STRING
       },
-      transfuciones: {
+      descripcion: {
         type: Sequelize.STRING
       },
-      cirugiasPre: {
-        type: Sequelize.STRING
-      },
-      otrasEnf: {
-        type: Sequelize.STRING
-      },
-      id_paciente: {
+      id_medico: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {
-          model: 'pacientes',
+          model: 'medicoUsers',
           key: 'id',
-          as: 'id_paciente',
+          as: 'id_medico',
         }
       },
       createdAt: {
@@ -40,6 +34,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('antcPersonalesPtls');
+    await queryInterface.dropTable('alergias');
   }
 };
