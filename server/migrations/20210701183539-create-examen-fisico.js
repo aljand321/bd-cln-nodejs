@@ -1,39 +1,45 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('antcGinecoObsts', {
+    await queryInterface.createTable('examenFisicos', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      menarca: {
-        type: Sequelize.STRING
+      cabeza: {
+        type: Sequelize.TEXT
       },
-      ritmo: {
-        type: Sequelize.STRING
+      cuello: {
+        type: Sequelize.TEXT
       },
-      fmu: {
-        type: Sequelize.STRING
+      torax: {
+        type: Sequelize.TEXT
       },
-      gestaCesaria: {
-        type: Sequelize.STRING
+      pulmones: {
+        type: Sequelize.TEXT
       },
-      abortos: {
-        type: Sequelize.STRING
+      corazon: {
+        type: Sequelize.TEXT
       },
-      nacidoVivos: {
-        type: Sequelize.STRING
+      abdomen: {
+        type: Sequelize.TEXT
       },
-      mortinatos: {
-        type: Sequelize.STRING
+      ginecoUrinario: {
+        type: Sequelize.TEXT
       },
-      plfcFamiliar: {
-        type: Sequelize.STRING
+      locomotor: {
+        type: Sequelize.TEXT
       },
-      fecha:{
-        type:Sequelize.STRING
+      neurologico: {
+        type: Sequelize.TEXT
+      },
+      pielyFaneras: {
+        type: Sequelize.TEXT
+      },
+      diagnosticoPresuntivo: {
+        type: Sequelize.TEXT
       },
       id_medico:{
         type: Sequelize.INTEGER,
@@ -44,7 +50,7 @@ module.exports = {
           as: 'id_medico',
         }
       },
-      id_paciente: {
+      id_paciente:{
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {
@@ -52,7 +58,7 @@ module.exports = {
           key: 'id',
           as: 'id_paciente',
         }
-      },
+      },      
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -64,6 +70,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('antcGinecoObsts');
+    await queryInterface.dropTable('examenFisicos');
   }
 };

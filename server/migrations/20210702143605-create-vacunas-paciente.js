@@ -1,20 +1,17 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('inmunizaciones', {
+    await queryInterface.createTable('vacunasPacientes', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      description: {
+        type: Sequelize.STRING
+      },
       fecha: {
-        type: Sequelize.DATE
-      },
-      tipo: {
-        type: Sequelize.JSON
-      },
-      otros: {
         type: Sequelize.STRING
       },
       id_paciente: {
@@ -24,6 +21,24 @@ module.exports = {
           model: 'pacientes',
           key: 'id',
           as: 'id_paciente',
+        }
+      },
+      id_vacuna: {
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'vacunas',
+          key: 'id',
+          as: 'id_vacuna',
+        }
+      },
+      id_medico: {
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'medicoUsers',
+          key: 'id',
+          as: 'id_medico',
         }
       },
       createdAt: {
@@ -37,6 +52,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('inmunizaciones');
+    await queryInterface.dropTable('vacunasPacientes');
   }
 };

@@ -1,18 +1,30 @@
 module.exports = (sequelize, DataTypes) => {
-  const antcGinecoObst = sequelize.define('antcGinecoObst', {
-    fecha: {
-      type:DataTypes.DATE,
-    },
+  const antcGinecoObst = sequelize.define('antcGinecoObst', {    
     menarca: {
-      type: DataTypes.NUMBER      
+      type: DataTypes.STRING      
     },
     ritmo: DataTypes.STRING,
     fmu: DataTypes.STRING,
     gestaCesaria: DataTypes.STRING,
     abortos: DataTypes.STRING,
-    nacidoVivos: DataTypes.INTEGER,
-    mortinatos: DataTypes.INTEGER,
-    plfcFamiliar: DataTypes.STRING,
+    nacidoVivos: DataTypes.STRING,
+    mortinatos: DataTypes.STRING,
+    plfcFamiliar: DataTypes.STRING,  
+    fecha: {
+      type:DataTypes.STRING,
+    },  
+    id_medico: {
+      type: DataTypes.INTEGER,
+      allowNull: {
+        args: false,
+        msg: 'No se esta mandando el id del medico'
+      },
+      references: {
+        model: 'medicoUser',
+        key: 'id',
+        as: 'id_medico',
+      }
+    },
     id_paciente: {
       type: DataTypes.INTEGER,
       allowNull: {
@@ -30,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     antcGinecoObst.belongsTo(models.paciente, {
       foreignKey: 'id_paciente',
+      onDelete: 'CASCADE'
+    });
+    antcGinecoObst.belongsTo(models.medicoUser, {
+      foreignKey: 'id_medico',
       onDelete: 'CASCADE'
     });
   };

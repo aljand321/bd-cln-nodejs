@@ -17,9 +17,6 @@ module.exports = {
       hnos: {
         type: Sequelize.JSON
       },
-      estSalud: {
-        type: Sequelize.STRING
-      },
       id_paciente: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
@@ -27,6 +24,15 @@ module.exports = {
           model: 'pacientes',
           key: 'id',
           as: 'id_paciente',
+        }
+      },
+      id_medico: {
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'medicoUsers',
+          key: 'id',
+          as: 'id_medico',
         }
       },
       createdAt: {

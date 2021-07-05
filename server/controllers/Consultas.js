@@ -1,4 +1,3 @@
-import { async } from 'regenerator-runtime';
 import model from '../models';
 
 const {consulta} = model; 
@@ -9,7 +8,7 @@ class Consultas {
         const {motivo,enfermedadActual,signosVitales} = req.body;
         const {id_paciente,id_medico} = req.params;
         const validateDatas = await datas(motivo,enfermedadActual,id_paciente,id_medico);
-        if(validateDatas.success == false) return res.status(400).json(validateDatas);
+        if(validateDatas.success == false) return res.status(200).json(validateDatas);
         try {
             const resp = await consulta.create({
                 motivo,
@@ -45,12 +44,36 @@ class Consultas {
             res.status(500).json(error);
         } 
     }
+    static async oneConsulta (req,res){
+        const { id_consulta } = req.params;
+        try {
+            const resp = await consulta.findOne({
+                where:{id:id_consulta}
+            });
+            if(resp){
+                res.status(200).json({
+                    success:true,
+                    msg:"Consulta",
+                    resp
+                })
+                
+            }else{
+                res.status(200).json({
+                    success:false,
+                    msg:"No existe esa consulta"
+                })
+            }   
+            
+        } catch (error) {
+            res.status(500).json(error);
+        } 
+    }
 }
 function datas(motivo,enfermedadActual,id_paciente,id_medico){
-    if(!motivo) return {success:false,msg:"Motivo de consulta es obligatorio"}
-    if(!enfermedadActual) return {success:false,msg:"Efermedad actual es obligatorio"}
-    if(!id_paciente) return {success:false,msg:"No se esta mandando el id del paciente"}
-    if(!id_medico) return {success:false,msg:"No se esta mandando el id del medico"}
+    if(!motivo) return {success:false,msg:"Motivo de consulta es obligatorio", name:'motivo'}
+    if(!enfermedadActual) return {success:false,msg:"Efermedad actual es obligatorio", name:'enfermedadActual'}
+    if(!id_paciente) return {success:false,msg:"No se esta mandando el id del paciente", name:'id_paciente'}
+    if(!id_medico) return {success:false,msg:"No se esta mandando el id del medico", name:'id_medico'}
     return {success:true,msg:"puedes continuar"}
 
 }

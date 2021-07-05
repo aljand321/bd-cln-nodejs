@@ -9,13 +9,6 @@ module.exports = (sequelize, DataTypes) => {
     hnos: {
       type: DataTypes.JSON
     },
-    estSalud: {
-      type: DataTypes.STRING,
-      allowNull: {
-        args: false,
-        msg: 'Este campo es obligatorio'
-      }
-    },
     id_paciente: {
       type: DataTypes.INTEGER,
       allowNull: {
@@ -27,12 +20,28 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id',
         as: 'id_paciente',
       }
-    }
+    },
+    id_medico: {
+      type: DataTypes.INTEGER,
+      allowNull: {
+        args: false,
+        msg: 'No se esta mandando el id del medico'
+      },
+      references: {
+        model: 'medicoUser',
+        key: 'id',
+        as: 'id_medico',
+      }
+    }    
   }, {});
   antcFamiliares.associate = (models) => {
     // associations can be defined here
     antcFamiliares.belongsTo(models.paciente, {
       foreignKey: 'id_paciente',
+      onDelete: 'CASCADE'
+    });
+    antcFamiliares.belongsTo(models.medicoUser, {
+      foreignKey: 'id_medico',
       onDelete: 'CASCADE'
     });
   };

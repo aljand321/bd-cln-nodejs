@@ -63,8 +63,7 @@ module.exports = (sequelize, DataTypes) => {
     
   }, {});
   paciente.associate = (models) => {
-    // associations can be defined here
-    
+    // associations can be defined here    
     paciente.hasMany(models.consulta, {
       foreignKey: 'id_paciente',
     });
@@ -75,9 +74,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'id_paciente',
     });
     paciente.hasMany(models.antcPersonalesNoPtl, {
-      foreignKey: 'id_paciente',
-    });
-    paciente.hasMany(models.inmunizaciones, {
       foreignKey: 'id_paciente',
     });
     paciente.belongsToMany(models.alergias,{
@@ -98,6 +94,11 @@ module.exports = (sequelize, DataTypes) => {
     paciente.belongsToMany(models.OtrasEnfermedades,{
       through:'otrasEnfPaciente',
       as: 'OtrasEnfermedades',
+      foreignKey:'id_paciente'
+    });
+    paciente.belongsToMany(models.vacunas,{
+      through:'vacunasPaciente',
+      as: 'vacunas',
       foreignKey:'id_paciente'
     });
     paciente.belongsTo(models.medicoUser, {

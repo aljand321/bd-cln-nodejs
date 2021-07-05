@@ -9,6 +9,11 @@ import Alergias from "../controllers/Alergias";
 import Transfuciones from "../controllers/Transfuciones";
 import Cirugias from "../controllers/Cirugias";
 import OtrEnfermedades from "../controllers/OtrEnfermedades";
+import AntcPersonNoPatologicos from "../controllers/AntcPersNoPatologicos";
+import AntecedentesFamiliares from "../controllers/AnteceFamiliares";
+import ExamenFisico from "../controllers/exmFisico";
+import AntGinecoObst from "../controllers/AntcGinecoObst";
+import Vacunas from "../controllers/Vacunas";
 export default (app) => {
   app.get("/api", (req, res) =>
     res.status(200).send({
@@ -44,6 +49,7 @@ export default (app) => {
   //consulta paciente
   app.post('/api/consulta/:id_paciente/:id_medico', Consultas.create);
   app.get('/api/consutla/:id_paciente', Consultas.consultaPaciente);
+  app.get('/api/oneConsulta/:id_consulta', Consultas.oneConsulta);
 
   //alergias
   app.post('/api/alergias/:id_medico', Alergias.create);
@@ -69,6 +75,30 @@ export default (app) => {
   app.get('/api/pacienteEnfermedades/:id_paciente', OtrEnfermedades.listEnfPaciente);
   app.post('/api/buscarEnfermedad', OtrEnfermedades.buscarEnf);
 
+  //antecedentes no patologicos
+  app.post('/api/antecedentesNoPtl/:id_medico/:id_paciente', AntcPersonNoPatologicos.create);
+  app.get('/api/antNoPtlPaciente/:id_paciente', AntcPersonNoPatologicos.list);
+  app.get('/api/oneAntNoPtl/:id_antecedente', AntcPersonNoPatologicos.oneAntecedentes);
+
+  //antecedentes familiares
+  app.post('/api/createAntFamiliares/:id_medico/:id_paciente',AntecedentesFamiliares.create);
+  app.get('/api/listAntFamiliares/:id_paciente',AntecedentesFamiliares.list)
+
+  //Examen fisico
+  app.post('/api/createExamenFisico/:id_medico/:id_paciente',ExamenFisico.create);
+  app.get('/api/listExFisPaciente/:id_paciente', ExamenFisico.listExFis);
+  app.get('/api/oneExamenFisico/:id_examenFisico', ExamenFisico.oneExFis);
+
+  //antecedentes gineco obstetricos
+  app.post('/api/createAntGincoObs/:id_medico/:id_paciente',AntGinecoObst.create);
+  app.get('/api/listAntGnbPaciente/:id_paciente',AntGinecoObst.list);
+
+  //vacunas
+  app.post('/api/createVacuna/:id_medico',Vacunas.create);
+  app.post('/api/vacunaPaciente/:id_medico', Vacunas.createVacunaPaciente);
+  app.get('/api/vacunaPaciente/:id_paciente', Vacunas.listVacunasPaciente);
+  app.post('/api/buscarVacuna', Vacunas.buscador);
+
 };
 
 
@@ -91,6 +121,12 @@ export default (app) => {
 //sequelize model:create --name crPaciente --attributes id_paciente:integer,id_cirugiaP:integer,id_medico:integer
 //sequelize model:create --name otrasEnfPaciente --attributes id_paciente:integer,id_otrasEnf:integer,id_medico:integer
 
+//sequelize model:create --name examenFisico --attributes cabeza:text,cuello:text,torax:text,pulmones:text,corazon:text,abdomen:text,ginecoUrinario:text,locomotor:text,neurologico:text,pielyFaneras:text
+
+//sequelize model:create --name vacunas --attributes nombre:string,descripcion:text,id_medico:integer
+
+//sequelize model:create --name vacunasPaciente --attributes fecha:date,id_paciente:integer,id_vacuna:integer,id_medico:integer
+//
 
 
 //

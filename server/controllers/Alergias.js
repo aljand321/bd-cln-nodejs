@@ -97,7 +97,6 @@ class Alergias{
                 },
                 attributes:['id','nombre','descripcion','id_medico']
             });
-            console.log(resp)
             let datas = []
             for(let i = 0; i < resp.length; i++){
                 datas.push({
@@ -137,7 +136,6 @@ async function validateNombre(nombre){
                 nombre:{ [Op.iLike]: `${nombre.trim()}%`}
             }
         });
-        //console.log(resp, ' alskdjlaksjdlkajsdlkajsldkj')
         if(resp) return {success:false,msg:"Alergia ya esta registrado", name:'nombre'}
         return {success:true,msg:"no existe alergia"}
     } catch (error) {

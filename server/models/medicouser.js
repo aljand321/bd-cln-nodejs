@@ -85,6 +85,9 @@ module.exports = (sequelize, DataTypes) => {
     medicoUser.hasMany(models.consulta, {
       foreignKey: 'id_medico',
     });
+    medicoUser.hasMany(models.vacunas, {
+      foreignKey: 'id_medico',
+    });
   };
   return medicoUser;
 };
