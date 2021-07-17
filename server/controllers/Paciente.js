@@ -53,7 +53,6 @@ class Paciente {
     }
     static async buscarPaciente(req,res){
         const { buscar,pagina,limite } = req.body;
-        console.log(buscar, ' 2w2223123123123')
         const getPagination = (page, size) => {
             const limit = size ? +size : 2;
             const offset = page ? page * limit : 0;
@@ -133,18 +132,33 @@ class Paciente {
         try {
             const resp = await paciente.findOne({
                 where:{id:id_paciente},
-                attributes:['id','nombres','apellidos','sexo','ci','telefono','direccion','edad','ocupacion']
+                attributes:['id','nombres','apellidos','sexo','ci','telefono','direccion','edad','ocupacion','id_medico']
             });
+            let hoy = new Date();
+            let fechaNacimiento = new Date(resp.edad)
+            let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
             if(resp)return res.status(200).json({
                 success:true,
                 msg:"paciente",
-                resp
+                resp:{
+                    id:resp.id,
+                    nombres:resp.nombres,
+                    apellidos:resp.apellidos,
+                    sexo:resp.sexo,
+                    ci:resp.ci,
+                    telefono:resp.telefono,
+                    direccion:resp.direccion,
+                    edad:edad,
+                    ocupacion:resp.ocupacion,
+                    id_medico:resp.id_medico,
+                }
             })
-            return res.status(400).json({
+            return res.status(200).json({
                 success:false,
                 msg:"El paciente no exite"
             })
         } catch (error) {
+            console.log(error)
             res.status(500).json(error);
         }
     }

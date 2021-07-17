@@ -31,7 +31,7 @@ import model from '../models';
         }
     }
     static async list (req,res){
-        const {id_paciente} = req.params;
+        const {id_paciente, id_medico} = req.params;
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
         try {
@@ -50,10 +50,13 @@ import model from '../models';
                     createdAt:resp[i].createdAt
                 }) 
             }
+            let data = await arr.filter((data)=>{
+                return data.id_medico == id_medico
+            })
             res.status(200).json({
                 success:true,
                 msg:"lista de antecedentes personales no patologicos del paciente",
-                resp:arr
+                resp:id_medico == 'null' ? arr : data
             })      
         } catch (error) {
             res.status(500).json(error);

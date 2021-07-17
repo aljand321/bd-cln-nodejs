@@ -40,7 +40,7 @@ class ExamenFisico{
         }
     }
     static async listExFis (req,res){
-        const {id_paciente}= req.params;
+        const {id_paciente,id_medico}= req.params;
         console.log(req.params)
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);  
@@ -63,10 +63,13 @@ class ExamenFisico{
                     'id_medico'
                 ]
             });
+            let filterId = await resp.filter((data) =>{
+                return data.id_medico == id_medico;
+            });
             res.status(200).json({
                 success:true,
                 msg:"lista de examenes del paciente",
-                resp
+                resp:id_medico == 'null' ? resp : filterId
             })
         } catch (error) {
             console.log(error)

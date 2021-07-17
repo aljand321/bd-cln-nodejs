@@ -58,7 +58,7 @@ class Cirugias{
         }
     }  
     static async listCirugiasPaciente(req,res){
-        const {id_paciente}= req.params;
+        const {id_paciente,id_medico}= req.params;
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
         try {
@@ -72,10 +72,13 @@ class Cirugias{
                 }],
                 attributes:['id',]
             });
+            let cir = await resp[0].cirugiasPrevias.filter((data)=>{
+                return data.crPaciente.id_medico == id_medico;
+            })
             res.status(200).json({
                 success:true,
                 msg:"Lista de Cirugias del paciente",
-                resp
+                resp: id_medico == 'null' ? resp[0].cirugiasPrevias : cir
             })
         } catch (error) {            
             res.status(500).json(error)

@@ -52,15 +52,18 @@ import model from '../models';
         }
     }
     static async list(req,res){
-        const {id_paciente}= req.params
+        const {id_paciente,id_medico}= req.params
         try {
             const resp = await antcFamiliares.findAll({
                 where:{id_paciente}
             });
+            let filterId = await resp.filter((data)=>{
+                return data.id_medico == id_medico
+            })
             res.status(200).json({
                 success:true,
                 msg:"Lista de antecedentes de todos los pacientes",
-                resp
+                resp:id_medico == 'null' ? resp : filterId
             })
         } catch (error) {
             res.status(500).json(error);

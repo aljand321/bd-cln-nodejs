@@ -29,12 +29,15 @@ module.exports = {
       edad: {
         type: Sequelize.DATE
       },
+      cargo: {
+        type: Sequelize.STRING
+      },
       especialidad:{
         type: Sequelize.STRING
       },
       img:{
         type:Sequelize.STRING
-      },
+      }, 
       password: {
         type: Sequelize.STRING
       },

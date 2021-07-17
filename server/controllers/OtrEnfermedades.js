@@ -58,7 +58,7 @@ class OtrEnfermedades{
         }
     }  
     static async listEnfPaciente(req,res){
-        const {id_paciente}= req.params;
+        const {id_paciente,id_medico}= req.params;
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
         try {
@@ -72,10 +72,13 @@ class OtrEnfermedades{
                 }],
                 attributes:['id',]
             });
+            let enf = await resp[0].OtrasEnfermedades.filter((data)=>{
+                return data.otrasEnfPaciente.id_medico == id_medico;
+            })
             res.status(200).json({
                 success:true,
                 msg:"Lista de Transfuciones del paciente",
-                resp
+                resp:id_medico == 'null' ? resp[0].OtrasEnfermedades : enf
             })
         } catch (error) {            
             res.status(500).json(error)

@@ -59,7 +59,7 @@ class Alergias{
         }
     }
     static async listALgPaciente(req,res){
-        const {id_paciente}= req.params;
+        const {id_paciente,id_medico}= req.params;
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
         try {
@@ -73,12 +73,17 @@ class Alergias{
                 }],
                 attributes:['id',]
             });
+            
+            let alergia = await resp[0].alergias.filter((data)=>{               
+                return data.algPaciente.id_medico == id_medico;
+            });
             res.status(200).json({
                 success:true,
                 msg:"Lista de alergias del paciente",
-                resp
+                resp: id_medico == 'null' ? resp[0].alergias :  alergia
             })
-        } catch (error) {            
+        } catch (error) {    
+            console.log(error)        
             res.status(500).json(error)
         }
         

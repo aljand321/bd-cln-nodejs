@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 //auth token
-//app.use(Authtoken);
+app.use(Authtoken);
 routes(app);
 app.get("*", (req, res) =>
   res.status(200).send({

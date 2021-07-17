@@ -38,15 +38,21 @@ class AntGinecoObst {
     }
   }
   static async list(req,res){
-    const {id_paciente}= req.params;
+    const {id_paciente,id_medico}= req.params;
+    const verifyPaciente = await validatePaciente(id_paciente);
+    console.log(verifyPaciente,' sssssssssssssssssssssssssssssss')
+    if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente); 
     try {
         const resp = await antcGinecoObst.findAll({
           where: {id_paciente}
         });
+        let filterId = await resp.filter((data) =>{
+          return data.id_medico == id_medico;
+        })
         res.status(200).json({
             success:true,
             msg:"Lista",
-            resp
+            resp: id_medico == 'null' ? resp : filterId
         })
     } catch (error) {
         res.status(500).json(error);
@@ -93,7 +99,13 @@ async function validatePaciente(id_paciente){
       const resp = await paciente.findOne({
           where:{id:id_paciente}
       });
-      if(resp) return {success:true,msg:"Existe el paciente"}
+      console.log(resp.sexo);      
+      if(resp){
+        if(resp.sexo != "mujer") return {success:false, msg:"Este formulario solo es para mujeres"}
+        return {success:true, msg:"puedes continuar"}
+      }
+      
+      
       return {success:false,msg:"No existe paciente"}
   } catch (error) {
       console.log(error)

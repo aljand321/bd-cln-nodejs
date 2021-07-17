@@ -62,7 +62,7 @@ class Vacunas {
         }
     }
     static async listVacunasPaciente(req,res){
-        const {id_paciente}= req.params;
+        const {id_paciente,id_medico}= req.params;
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
         try {
@@ -76,10 +76,13 @@ class Vacunas {
                 }],
                 attributes:['id',]
             });
+            let vacuna = await resp.vacunas.filter((data)=>{
+                return data.vacunasPaciente.id_medico == id_medico;
+            })
             res.status(200).json({
                 success:true,
                 msg:"Lista de vacunas del paciente",
-                resp
+                resp:id_medico == 'null' ? resp.vacunas : vacuna
             })
         } catch (error) {            
             res.status(500).json(error)

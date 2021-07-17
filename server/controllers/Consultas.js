@@ -1,7 +1,6 @@
 import model from '../models';
 
-const {consulta} = model; 
-const { paciente } = model;
+const {paciente,consulta,medicoUser} = model; 
 
 class Consultas {
     static async create(req,res){
@@ -28,21 +27,91 @@ class Consultas {
         
     }
     static async consultaPaciente (req,res){
-        const { id_paciente } = req.params;
+        const { id_paciente,id_medico } = req.params;
         const veriFyPaciente = await validationPaciente(id_paciente);
         if(veriFyPaciente.success == false) return res.status(400).json(veriFyPaciente)
         try {
             const resp = await consulta.findAll({
                 where:{id_paciente}
-            });
+            });            
+            
+            let consultas = await resp.filter(function(data){                
+                return data.id_medico == id_medico
+            })
             res.status(200).json({
                 success:true,
                 msg:"Lista de consultas del paciente",
-                resp
+                resp:id_medico == 'null' ? resp : consultas
             })
         } catch (error) {
             res.status(500).json(error);
         } 
+    }
+    static async consultaMEdico (req, res) {        
+        const {id_medico}=req.params;
+        const {buscar}= req.query
+        const verifyMedico = await validateMedico(id_medico);
+        if(verifyMedico.success == false) return res.status(200).json(verifyMedico)
+        try {
+            /* const resp = await consulta.findAll({
+                where: {id_medico},
+                attributes:['id','id_medico','id_paciente'],
+                include:{
+                    model:paciente,
+                    attributes:['id','nombres','apellidos','sexo','ci','telefono','direccion','edad','ocupacion']
+                }
+            });
+            let filter = await resp.filter((data)=>{
+                return  data.paciente.nombres.toLowerCase().includes(buscar.toLowerCase()) || 
+                        data.paciente.apellidos.toLowerCase().includes(buscar.toLowerCase()) ||
+                        data.paciente.ci.toLowerCase().includes(buscar.toLowerCase()) ||
+                        data.paciente.telefono.toString().includes(buscar) 
+            })
+            res.status(200).json({
+                success:true,
+                msg:"lista de consultas que el medico registro",
+                resp:filter
+            }) */
+            const resp = await paciente.findAll({
+                include:{
+                    model:consulta,
+                    where:{id_medico},
+                    attributes:['createdAt']
+                }
+            });
+            let arr = [];
+            let hoy = new Date();
+            for(let i = 0; i < resp.length; i++){
+                let fechaNacimiento = new Date(resp[i].edad)
+                let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+                arr.push({
+                    id:resp[i].id,
+                    nombres:resp[i].nombres,
+                    apellidos:resp[i].apellidos,
+                    sexo:resp[i].sexo,
+                    ci:resp[i].ci,
+                    telefono:resp[i].telefono,
+                    direccion:resp[i].direccion,
+                    edad:edad,
+                    ocupacion:resp[i].ocupacion,
+                })
+            }
+            let filter = await arr.filter((data)=>{
+                return  data.nombres.toLowerCase().includes(buscar.toLowerCase()) || 
+                        data.apellidos.toLowerCase().includes(buscar.toLowerCase()) ||
+                        data.ci.toLowerCase().includes(buscar.toLowerCase()) ||
+                        data.telefono.toString().includes(buscar) ||
+                        data.edad.toString().includes(buscar)
+            })
+            res.status(200).json({
+                success:true,
+                msg:"lista de pacientes que el medico hizo una consulta", 
+                resp:filter
+            })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error)
+        }
     }
     static async oneConsulta (req,res){
         const { id_consulta } = req.params;
@@ -69,11 +138,13 @@ class Consultas {
         } 
     }
 }
-function datas(motivo,enfermedadActual,id_paciente,id_medico){
+async function datas(motivo,enfermedadActual,id_paciente,id_medico){
     if(!motivo) return {success:false,msg:"Motivo de consulta es obligatorio", name:'motivo'}
     if(!enfermedadActual) return {success:false,msg:"Efermedad actual es obligatorio", name:'enfermedadActual'}
     if(!id_paciente) return {success:false,msg:"No se esta mandando el id del paciente", name:'id_paciente'}
     if(!id_medico) return {success:false,msg:"No se esta mandando el id del medico", name:'id_medico'}
+    const verifyMedico = await validateMedico(id_medico);
+    if(verifyMedico.success == false) return verifyMedico
     return {success:true,msg:"puedes continuar"}
 
 }
@@ -84,11 +155,22 @@ async function validationPaciente(id_paciente){
             attributes:['id']           
         })
         if(resp){
-            return {success:true,msg:"si existe ese usario"}
+            return {success:true,msg:"si existe el paciente"}
         }else{
-            return {success:false,msg:"no existe ese usario"}
+            return {success:false,msg:"no existe el paciente"}
         }
 
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+}
+async function validateMedico(id_medico){
+    try {
+        const resp = await medicoUser.findOne({
+            where:{id:id_medico}
+        })
+        if(resp) return {success:true,msg:"Si existe el medico"}
+        return {success:false,msg:"no existe ese medico"}
     } catch (error) {
         return {success:false,msg:"error 500"}
     }

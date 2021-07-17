@@ -27,17 +27,23 @@ export default (app) => {
   app.put("/api/books/:bookId", Books.modify); // API route for user to edit a book
   app.delete("/api/books/:bookId", Books.delete); // API route for user to delete a book
 
+  
+
   //medico user
-  app.post('/api/medico', MedicoUser.create);
-  app.post('/api/createMedico', MedicoUser.create);
-  app.get('/api/getList', MedicoUser.getList);
+  app.post('/api/createMedico/:id_medicoUser', MedicoUser.create);
+  app.get('/api/getList', MedicoUser.getList); // esto no depende del login
   app.get('/api/medico', MedicoUser.list);
   app.get('/api/medico/:id_medico', MedicoUser.oneUser);
   app.put('/api/medico/:id_medico', MedicoUser.updateUser);
-  app.delete('/api/deleteMEdico/:id_user', MedicoUser.deleteUser)
+  app.delete('/api/deleteMEdico/:id_user', MedicoUser.deleteUser);
+  app.post('/api/listPasientemedico/:id_medico',MedicoUser.lisPacientesMEdico);
+  app.get('/api/listaUsers', MedicoUser.listaUsers)
 
+  //login
   app.post('/api/login', Login.login);
+  app.post('/api/createfirstUser',Login.createFirstUser);
   app.get('/api/verifyToken', Login.verifyToken);
+  
 
   //paciente
   app.post('/api/paciente/:id_medico',Paciente.create);
@@ -48,60 +54,61 @@ export default (app) => {
 
   //consulta paciente
   app.post('/api/consulta/:id_paciente/:id_medico', Consultas.create);
-  app.get('/api/consutla/:id_paciente', Consultas.consultaPaciente);
+  app.get('/api/consulta/:id_paciente/:id_medico', Consultas.consultaPaciente);
   app.get('/api/oneConsulta/:id_consulta', Consultas.oneConsulta);
+  app.get('/api/consultasMedico/:id_medico', Consultas.consultaMEdico)
 
   //alergias
   app.post('/api/alergias/:id_medico', Alergias.create);
   app.post('/api/pacienteAlergias/:id_medico', Alergias.createAlgPaciente);
-  app.get('/api/pacienteAlergias/:id_paciente', Alergias.listALgPaciente);
+  app.get('/api/pacienteAlergias/:id_paciente/:id_medico', Alergias.listALgPaciente);
   app.post('/api/buscarAlergia', Alergias.buscarAlergia);
 
   // transfuciones
   app.post('/api/transfcion/:id_medico',Transfuciones.create);
   app.post('/api/pacienteTransfuciones/:id_medico', Transfuciones.createTransfucionPaciente);
-  app.get('/api/pacienteTransfuciones/:id_paciente', Transfuciones.listTransfucionesPaciente);
+  app.get('/api/pacienteTransfuciones/:id_paciente/:id_medico', Transfuciones.listTransfucionesPaciente);
   app.post('/api/buscarTransfucion', Transfuciones.buscarTransfucion);
 
   //cirugias previas
   app.post('/api/cirugias/:id_medico',Cirugias.create);
   app.post('/api/pacienteCirugias/:id_medico', Cirugias.createCirugiasPaciente);
-  app.get('/api/pacienteCirugias/:id_paciente', Cirugias.listCirugiasPaciente);
+  app.get('/api/pacienteCirugias/:id_paciente/:id_medico', Cirugias.listCirugiasPaciente);
   app.post('/api/buscarCirugia', Cirugias.buscarCirugia);
 
   //otras enfermedades
   app.post('/api/otrEnfermedades/:id_medico',OtrEnfermedades.create);
   app.post('/api/pacienteEnfermedades/:id_medico', OtrEnfermedades.createOtrEnfPaciente);
-  app.get('/api/pacienteEnfermedades/:id_paciente', OtrEnfermedades.listEnfPaciente);
+  app.get('/api/pacienteEnfermedades/:id_paciente/:id_medico', OtrEnfermedades.listEnfPaciente);
   app.post('/api/buscarEnfermedad', OtrEnfermedades.buscarEnf);
 
   //antecedentes no patologicos
   app.post('/api/antecedentesNoPtl/:id_medico/:id_paciente', AntcPersonNoPatologicos.create);
-  app.get('/api/antNoPtlPaciente/:id_paciente', AntcPersonNoPatologicos.list);
+  app.get('/api/antNoPtlPaciente/:id_paciente/:id_medico', AntcPersonNoPatologicos.list);
   app.get('/api/oneAntNoPtl/:id_antecedente', AntcPersonNoPatologicos.oneAntecedentes);
 
   //antecedentes familiares
   app.post('/api/createAntFamiliares/:id_medico/:id_paciente',AntecedentesFamiliares.create);
-  app.get('/api/listAntFamiliares/:id_paciente',AntecedentesFamiliares.list)
+  app.get('/api/listAntFamiliares/:id_paciente/:id_medico',AntecedentesFamiliares.list)
 
   //Examen fisico
   app.post('/api/createExamenFisico/:id_medico/:id_paciente',ExamenFisico.create);
-  app.get('/api/listExFisPaciente/:id_paciente', ExamenFisico.listExFis);
+  app.get('/api/listExFisPaciente/:id_paciente/:id_medico', ExamenFisico.listExFis);
   app.get('/api/oneExamenFisico/:id_examenFisico', ExamenFisico.oneExFis);
 
   //antecedentes gineco obstetricos
   app.post('/api/createAntGincoObs/:id_medico/:id_paciente',AntGinecoObst.create);
-  app.get('/api/listAntGnbPaciente/:id_paciente',AntGinecoObst.list);
+  app.get('/api/listAntGnbPaciente/:id_paciente/:id_medico',AntGinecoObst.list);
 
   //vacunas
   app.post('/api/createVacuna/:id_medico',Vacunas.create);
   app.post('/api/vacunaPaciente/:id_medico', Vacunas.createVacunaPaciente);
-  app.get('/api/vacunaPaciente/:id_paciente', Vacunas.listVacunasPaciente);
+  app.get('/api/vacunaPaciente/:id_paciente/:id_medico', Vacunas.listVacunasPaciente);
   app.post('/api/buscarVacuna', Vacunas.buscador);
 
 };
 
-
+//sequelize model:create --name peronal --attributes nombre:string,apellidos:string,ci:string,telefono:integer,direccion:string,edad:date,img:string,profecion:string,especialidad:string,fechaDeContrato:string
 //sequelize model:create --name medicoUser --attributes nombres:string,apellidos:string,ci:string,email:string,direccion:string,password:string
 //sequelize model:create --name paciente --attributes nombres:string,apellidos:string,sexo:boolean,direccion:string,edad:date,ocupacion:string,id_medico:integer
 //sequelize model:create --name antcPersonalesNoPtl --attributes instruccion:string,fuma:string,bebe:string,alimentacion:string,id_paciente:integer
@@ -126,7 +133,7 @@ export default (app) => {
 //sequelize model:create --name vacunas --attributes nombre:string,descripcion:text,id_medico:integer
 
 //sequelize model:create --name vacunasPaciente --attributes fecha:date,id_paciente:integer,id_vacuna:integer,id_medico:integer
-//
+
 
 
 //

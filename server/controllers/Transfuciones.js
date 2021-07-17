@@ -60,7 +60,7 @@ class Transfuciones{
         }
     }  
     static async listTransfucionesPaciente(req,res){
-        const {id_paciente}= req.params;
+        const {id_paciente,id_medico}= req.params;
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
         try {
@@ -74,10 +74,13 @@ class Transfuciones{
                 }],
                 attributes:['id',]
             });
+            let tr = await resp[0].transfuciones.filter((data) =>{
+                return  data.trPaciente.id_medico == id_medico;
+            })
             res.status(200).json({
                 success:true,
                 msg:"Lista de Transfuciones del paciente",
-                resp
+                resp:id_medico == 'null' ? resp[0].transfuciones : tr
             })
         } catch (error) {            
             res.status(500).json(error)
