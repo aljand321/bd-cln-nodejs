@@ -89,37 +89,30 @@ class Alergias{
         
     }
     static async buscarAlergia(req,res){
-        const {buscador}= req.body;    
-        try {
-            const resp = await alergias.findAll({
-                limit : 8,
-                offset: 0,
-                where:{                    
-                    [Op.or]: [
-                        {nombre:{ [Op.iLike]: `${buscador}%`}},
-                        {descripcion:{ [Op.iLike]: `${buscador}%`}}                        
-                    ]                    
-                },
-                attributes:['id','nombre','descripcion','id_medico']
-            });
-            let datas = []
-            for(let i = 0; i < resp.length; i++){
+        const {buscador,pagenumber,pagesize}= req.body;   
+        const resp = await buscarAlergias(buscador);
+        if(resp.success == false) return res.status(200).json(resp);
+        var pageNumber = pagenumber || 1;
+        var pageSize = pagesize || 8;
+        var alergias = resp.alg
+        var pageCount = Math.ceil(alergias.length / pageSize);
+        let pag = alergias.slice((pageNumber - 1)*pageSize, pageNumber * pageSize);
+        let datas = []
+            for(let i = 0; i < pag.length; i++){
                 datas.push({
-                    id:resp[i].id,
-                    nombre:resp[i].nombre,
-                    descripcion:resp[i].descripcion,
-                    id_medico:resp[i].id_medico,
+                    id:pag[i].id,
+                    nombre:pag[i].nombre,
+                    descripcion:pag[i].descripcion,
+                    id_medico:pag[i].id_medico,
                     selected:false
                 })
             }
-            res.status(200).json({
-                success:true,
-                msg:"lista de alergias",
-                resp:datas
-            })
-        } catch (error) {
-            res.status(500).json(error)
-        }
+        res.status(200).json({
+            success:true,
+            msg:"lista de alergias",
+            pageCount,
+            resp:datas            
+        });
     }
 }
 async function validateMedico(id_medico){
@@ -183,6 +176,21 @@ async function existAlergiaPaciente(id_paciente, id_alergia){
         return {success:true,msg:"No registrado en el paciente"}
     } catch (error) {
         return {success:false,msg:"erro 500"} 
+    }
+}
+async function buscarAlergias (buscador){    
+    try {
+        const resp = await alergias.findAll({
+            attributes:['id','nombre','descripcion','id_medico']
+        });        
+        const filter = resp.filter((data)=>{
+            return data.nombre.toLowerCase().includes(buscador.toLowerCase()) ||
+                   data.descripcion.toLowerCase().includes(buscador.toLowerCase());
+        })        
+        return {success:true,msg:'Alergias encontradas', alg:filter}
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:"erro 500"}
     }
 }
 export default Alergias;

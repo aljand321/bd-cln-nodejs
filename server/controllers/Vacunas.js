@@ -1,5 +1,6 @@
 import model from '../models';
 const Sequelize = require('sequelize');
+var sq = require('../models/index');
 const Op = Sequelize.Op;
 const { vacunas,vacunasPaciente,medicoUser,paciente } =  model;
 
@@ -66,25 +67,22 @@ class Vacunas {
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
         try {
-            const resp = await paciente.findOne({
-                where:{id:id_paciente},
-                include:[{
-                    model:vacunas,
-                    attributes:['id','nombre','descripcion','createdAt'],
-                    as:'vacunas'
-                    
-                }],
-                attributes:['id',]
-            });
-            let vacuna = await resp.vacunas.filter((data)=>{
-                return data.vacunasPaciente.id_medico == id_medico;
+            const resp = await sq.sequelize.query(`
+            select TP.id, TVP.id_vacuna,TVP.id_medico,TVP.description,TVP.fecha "fechaVacuanPaciente", TV.nombre "vacuna",TV.descripcion "VacunaDescripcion",TM.nombres "medico"
+            from "pacientes" TP, "vacunasPacientes" TVP, "vacunas" TV, "medicoUsers" TM
+            where TP.id = ${id_paciente} and TP.id = TVP.id_paciente and TVP.id_vacuna = TV.id and TVP.id_medico = TM.id
+            `);
+            let vacuna = await resp[0].filter((data)=>{
+                //console.log(data.id_medico)
+                return data.id_medico == id_medico;
             })
             res.status(200).json({
                 success:true,
                 msg:"Lista de vacunas del paciente",
-                resp:id_medico == 'null' ? resp.vacunas : vacuna
+                resp:id_medico == 'null' ? resp[0] : vacuna
             })
-        } catch (error) {            
+        } catch (error) {   
+            console.log(error)         
             res.status(500).json(error)
         }
         
@@ -96,9 +94,9 @@ class Vacunas {
         if(allP.success == false)return res.status(200).json(allP)
         var pageNumber=pagenumber || 1; 
         var pageSize=pagesize||8; 
-        var noticias = allP.resp
-        var pageCont =Math.ceil(noticias.length/pageSize);           
-        let pag = noticias.slice((pageNumber - 1 ) * pageSize, pageNumber * pageSize);
+        var vacunas = allP.resp
+        var pageCont =Math.ceil(vacunas.length/pageSize);           
+        let pag = vacunas.slice((pageNumber - 1 ) * pageSize, pageNumber * pageSize);
         res.status(200).json({
             success:true,
             msg:"Lista de vacunas",
@@ -184,7 +182,7 @@ async function all(buscador){
             return item.nombre.toLowerCase().includes(buscador.toLowerCase())||
             item.descripcion.toLowerCase().includes(buscador.toLowerCase())
         })        
-        return {success:true,msg:"lista de todos los pacientes", resp:filtrar}
+        return {success:true,msg:"Lista de vacunas", resp:filtrar}
     } catch (error) {
         console.log(error, ' sssssssssssssss44444444444444445555555555555555555555555555666666666666666')
         return {success:false, msg:"erro 500"}

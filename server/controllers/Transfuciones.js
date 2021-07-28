@@ -87,38 +87,31 @@ class Transfuciones{
         }
         
     }
-    static async buscarTransfucion(req,res){
-        const {buscador}= req.body;    
-        try {
-            const resp = await transfuciones.findAll({
-                limit : 8,
-                offset: 0,
-                where:{                    
-                    [Op.or]: [
-                        {nombre:{ [Op.iLike]: `${buscador}%`}},
-                        {descripcion:{ [Op.iLike]: `${buscador}%`}}                        
-                    ]                    
-                },
-                attributes:['id','nombre','descripcion','id_medico']
-            });
-            let datas = []
-            for(let i = 0; i < resp.length; i++){
+    static async buscarTransfucion(req,res){       
+        const {buscador,pagenumber,pagesize}= req.body;   
+        const resp = await buscarTransfucion(buscador);
+        if(resp.success == false) return res.status(200).json(resp);
+        var pageNumber = pagenumber || 1;
+        var pageSize = pagesize || 8;
+        var tr = resp.alg
+        var pageCount = Math.ceil(tr.length / pageSize);
+        let pag = tr.slice((pageNumber - 1)*pageSize, pageNumber * pageSize);
+        let datas = []
+            for(let i = 0; i < pag.length; i++){
                 datas.push({
-                    id:resp[i].id,
-                    nombre:resp[i].nombre,
-                    descripcion:resp[i].descripcion,
-                    id_medico:resp[i].id_medico,
+                    id:pag[i].id,
+                    nombre:pag[i].nombre,
+                    descripcion:pag[i].descripcion,
+                    id_medico:pag[i].id_medico,
                     selected:false
                 })
             }
-            res.status(200).json({
-                success:true,
-                msg:"lista de transfuciones",
-                resp:datas
-            })
-        } catch (error) {
-            res.status(500).json(error)
-        }
+        res.status(200).json({
+            success:true,
+            msg:"Lista de Transfuciones",
+            pageCount,
+            resp:datas            
+        });        
     }
 }
 async function validateMedico(id_medico){
@@ -183,6 +176,21 @@ async function existTransfucionPaciente(id_paciente, id_transfucion){
         return {success:true,msg:"No registrado en el paciente"}
     } catch (error) {
         return {success:false,msg:"erro 500"} 
+    }
+}
+async function buscarTransfucion(buscador){    
+    try {
+        const resp = await transfuciones.findAll({
+            attributes:['id','nombre','descripcion','id_medico']
+        });        
+        const filter = resp.filter((data)=>{
+            return data.nombre.toLowerCase().includes(buscador.toLowerCase()) ||
+                   data.descripcion.toLowerCase().includes(buscador.toLowerCase());
+        })        
+        return {success:true,msg:'Transfuciones encontradas', alg:filter}
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:"erro 500"}
     }
 }
 export default Transfuciones;

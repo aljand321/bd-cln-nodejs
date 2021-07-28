@@ -1,6 +1,3 @@
-import Users from "../controllers/user";
-import Books from "../controllers/book";
-
 import MedicoUser from '../controllers/MedicoUser';
 import Login from '../controllers/Login';
 import Paciente from "../controllers/Paciente";
@@ -20,14 +17,6 @@ export default (app) => {
       message: "Welcome to the BookStore API!",
     })
   );
-
-  app.post("/api/users", Users.signUp); // API route for user to signup
-  app.post("/api/users/:userId/books", Books.create); // API route for user to create a book
-  app.get("/api/books", Books.list); // API route for user to get all books in the database
-  app.put("/api/books/:bookId", Books.modify); // API route for user to edit a book
-  app.delete("/api/books/:bookId", Books.delete); // API route for user to delete a book
-
-  
 
   //medico user
   app.post('/api/createMedico/:id_medicoUser', MedicoUser.create);
@@ -56,7 +45,7 @@ export default (app) => {
   app.post('/api/consulta/:id_paciente/:id_medico', Consultas.create);
   app.get('/api/consulta/:id_paciente/:id_medico', Consultas.consultaPaciente);
   app.get('/api/oneConsulta/:id_consulta', Consultas.oneConsulta);
-  app.get('/api/consultasMedico/:id_medico', Consultas.consultaMEdico)
+  app.get('/api/consultasMedico/:id_medico', Consultas.consultaMEdico);
 
   //alergias
   app.post('/api/alergias/:id_medico', Alergias.create);

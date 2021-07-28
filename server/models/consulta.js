@@ -2,6 +2,8 @@ module.exports = (sequelize, DataTypes) => {
   const consulta = sequelize.define('consulta', {
     motivo: DataTypes.TEXT,
     enfermedadActual: DataTypes.TEXT,
+    diagPresuntivo: DataTypes.TEXT,
+    conducta: DataTypes.TEXT,
     signosVitales: DataTypes.JSON,    
     
     id_paciente: {

@@ -6,6 +6,7 @@ class AntGinecoObst {
   static async create(req, res) {
     const {fecha,menarca,ritmo,fmu,gestaCesaria,abortos,nacidoVivos,mortinatos, plfcFamiliar} = req.body;
     const { id_paciente,id_medico } = req.params;
+    console.log(req.body, 'esto es lo que quiero ver')
     const verifyMEdico = await validateMedico(id_medico);
     if(verifyMEdico.success == false) return res.status(200).json(verifyMEdico);
     const verifyPaciente = await validatePaciente(id_paciente);
@@ -101,7 +102,7 @@ async function validatePaciente(id_paciente){
       });
       console.log(resp.sexo);      
       if(resp){
-        if(resp.sexo != "mujer") return {success:false, msg:"Este formulario solo es para mujeres"}
+        if(resp.sexo != "F") return {success:false, msg:"Este formulario solo es para mujeres"}
         return {success:true, msg:"puedes continuar"}
       }
       

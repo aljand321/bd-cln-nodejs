@@ -14,6 +14,12 @@ module.exports = {
       enfermedadActual: {
         type: Sequelize.TEXT
       },
+      diagPresuntivo:{
+        type: Sequelize.TEXT
+      },
+      conducta:{
+        type: Sequelize.TEXT
+      },
       signosVitales: {
         type: Sequelize.JSON
       },
