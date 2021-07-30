@@ -1,5 +1,6 @@
 import model from '../models';
 const Sequelize = require('sequelize');
+var sq = require('../models/index');
 const Op = Sequelize.Op;
 const { medicoUser,paciente } = model;
 
@@ -278,6 +279,98 @@ class MedicoUser {
             res.status(500),json(error)
         }
     }
+    //contar todos los medicos
+    static async medicos(req,res){
+        try {
+            const resp = await sq.sequelize.query(`
+                select  count(*)
+                from "medicoUsers"
+                where cargo = 'medico'
+            `);
+            res.status(200).json({
+                success:true,
+                msg:"total de medicos",
+                resp:resp[0][0].count
+            })
+        } catch (error) {
+            res.status(500),json(error)
+        }
+    }
+    static async usarios(req,res){
+        try {
+            const resp = await sq.sequelize.query(`
+                select  count(*)
+                from "medicoUsers"
+                where cargo = 'usuario'
+            `);
+            res.status(200).json({
+                success:true,
+                msg:"total de usuarios",
+                resp:resp[0][0].count
+            })
+        } catch (error) {
+            res.status(500),json(error)
+        }
+    }
+    static async pacientesR(req,res){
+        try {
+            const resp = await sq.sequelize.query(`
+                select  count(*)
+                from "pacientes"
+            `);
+            res.status(200).json({
+                success:true,
+                msg:"Numero total de pacientes",
+                resp:resp[0][0].count
+            })
+        } catch (error) {
+            res.status(500),json(error)
+        }
+    }
+    static async vacunadosCovid (req,res){
+        const {buscador,dosis,pagenumber,pagesize} = req.body
+        const resp = await buscar(buscador,dosis);
+        if(resp.success == false) res.status(200).json(resp);
+        var pageNumber = pagenumber || 1;
+        var pageSize = pagesize || 8;
+        var pacientes = resp.paciente
+        var pageCount = Math.ceil(pacientes.length / pageSize);
+        let pag = pacientes.slice((pageNumber - 1)*pageSize, pageNumber * pageSize);
+        res.status(200).json({
+            success:true,
+            msg:"Lista de pacientes vacunados c19",
+            pageCount,
+            resp:pag
+        })
+    }
+
+    static async porcentajeVacunadosC19(req,res){
+        const cP = await totalPAcientes();
+        if(cP.success == false) return res.status(200).json(cp);
+        console.log(cP, 'esto es sssfff')
+        try {
+            const resp = await sq.sequelize.query(`
+                select count(*)"cantidad"
+                from (
+                    select  TVP.id_vacuna,TVP.id_paciente, count(*) "cantidad"
+                    from "vacunasPacientes" TVP, "vacunas" TV, "pacientes" TP
+                    where TVP.id_vacuna = TV.id and TVP.id_paciente = TP.id and TV.nombre ilike 'covid 19'
+                    group by  TVP.id_vacuna,TVP.id_paciente
+                )as porcentaje
+                where cantidad > 0
+            `);
+            let porcentaje = (100 * resp[0][0].cantidad) / cP.resp 
+            //let porcentaje = (100 *0) / 0
+
+            res.status(200).json({
+                success:true,
+                msg:"Porcentage de personas vacunados",
+                resp:isNaN(porcentaje) ? 0 : porcentaje
+            })
+        } catch (error) {
+            res.status(500),json(error)
+        }
+    } 
 }
 async function validateUser(id_medico){
     if(!id_medico)return {success:false,msg:"No se esta mandando el id del usario"};
@@ -326,6 +419,55 @@ async function validateMedicoUser(id_medicoUsers,role ){
         return {success:false,msg:'No existe ese medico', name:'error'}
     } catch (error) {
         return {success:false,msg:"erro 500"};
+    }
+}
+async function totalPAcientes(){
+    try {
+        const resp = await sq.sequelize.query(`
+            select count(*) "cantidadPacientes"
+            from "pacientes"
+        `)
+        return {success:true,msg:"cantidad de pacientes", resp:resp[0][0].cantidadPacientes}
+    } catch (error) {
+        return {success:false, msg:"error 500"}
+    }
+}
+async function buscar(buscador,dosis){
+    
+    const todo = `
+        select *
+        from  
+            (
+                select  TP.nombres,TP.apellidos,TP.ci,TP.telefono,TV.nombre "vacuna",TVP.id_vacuna,TVP.id_paciente, count(*) "cantidad" 
+                from "vacunasPacientes" TVP, "vacunas" TV, "pacientes" TP
+                where TVP.id_vacuna = TV.id and TVP.id_paciente = TP.id and TV.nombre ilike 'covid 19'
+                group by  TV.nombre,TVP.id_vacuna,TVP.id_paciente,TP.nombres,TP.apellidos,TP.ci,TP.telefono
+            ) as Vacunados	
+        where cantidad > ${dosis}
+    `
+    const porDosis = `
+        select *
+        from  
+            (
+                select  TP.nombres,TP.apellidos,TP.ci,TP.telefono,TV.nombre "vacuna",TVP.id_vacuna,TVP.id_paciente, count(*) "cantidad" 
+                from "vacunasPacientes" TVP, "vacunas" TV, "pacientes" TP
+                where TVP.id_vacuna = TV.id and TVP.id_paciente = TP.id and TV.nombre ilike 'covid 19'
+                group by  TV.nombre,TVP.id_vacuna,TVP.id_paciente,TP.nombres,TP.apellidos,TP.ci,TP.telefono
+            ) as Vacunados	
+        where cantidad = ${dosis}
+    `
+    try {
+        const resp = await sq.sequelize.query(dosis == 0 ? todo : porDosis)
+        const filter = await resp[0].filter((data)=>{
+            return data.nombres.toLowerCase().includes(buscador.toLowerCase()) || 
+                    data.apellidos.toLowerCase().includes(buscador.toLowerCase()) ||
+                    data.ci.toLowerCase().includes(buscador.toLowerCase()) ||
+                    data.telefono.toLowerCase().includes(buscador.toLowerCase());
+        })
+        return {success:true,msg:"Lista de pacientes encontrados",paciente:filter}
+    } catch (error) {
+        console.log(error)
+        return {success:false, msg:"error 500"}
     }
 }
 export default MedicoUser;

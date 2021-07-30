@@ -76,7 +76,12 @@ function permits(user, ruta){
             paciente:'/api/paciente/:id_medico',
             pacientes:'/api/pacientes',
             buscarPaciente:'/api/buscarPaciente',
-            consultasMedico:'/api/consultasMedico/:id_medico'
+            consultasMedico:'/api/consultasMedico/:id_medico',
+            //panel de control
+            totalMEdicos:'/api/totalMEdicos',
+            pacientesR:'/api/pacientesR',
+            vacunadosCovid:'/api/vacunadosCovid',
+            porcentajeVacunadosC19:'/api/porcentajeVacunadosC19'
         }
         if(rutaUser[r]){
             return true;

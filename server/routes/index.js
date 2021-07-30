@@ -28,6 +28,13 @@ export default (app) => {
   app.post('/api/listPasientemedico/:id_medico',MedicoUser.lisPacientesMEdico);
   app.get('/api/listaUsers', MedicoUser.listaUsers)
 
+  //para el panel
+  app.get('/api/totalMEdicos', MedicoUser.medicos);
+  app.get('/api/totalUsarios', MedicoUser.usarios);
+  app.get('/api/pacientesR', MedicoUser.pacientesR);
+  app.post('/api/vacunadosCovid', MedicoUser.vacunadosCovid);
+  app.get('/api/porcentajeVacunadosC19', MedicoUser.porcentajeVacunadosC19);
+
   //login
   app.post('/api/login', Login.login);
   app.post('/api/createfirstUser',Login.createFirstUser);
