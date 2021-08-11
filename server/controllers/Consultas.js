@@ -1,6 +1,6 @@
 import model from '../models';
 
-const {paciente,consulta,medicoUser} = model; 
+const {paciente,consulta,medicoUser,retornoPaciente} = model; 
 
 class Consultas {
     static async create(req,res){
@@ -143,6 +143,57 @@ class Consultas {
             res.status(500).json(error);
         } 
     }
+    static async createRetorno(req,res){
+        const {subjetivo,objetivo,diagnostico,tratamiento,signosVitales} = req.body;
+        const {id_medico,id_consulta} = req.params;
+        const verifyMedico = await validateMedico(id_medico);
+        if (verifyMedico.success == false) return res.status(200).json(verifyMedico);
+        const verifyConsulta = await validateCosnulta(id_consulta);
+        if(verifyConsulta.success == false) return res.status(200).json(verifyConsulta);
+        const verifyDatas = await validateDataRetorno(subjetivo,objetivo,diagnostico,tratamiento,signosVitales)
+        if (verifyDatas.success == false) return res.status(200).json(verifyDatas)
+        try {
+            const resp = await retornoPaciente.create({
+                subjetivo,
+                objetivo,
+                diagnostico,
+                tratamiento,
+                signosVitales,
+                id_medico,
+                id_consulta
+            })
+            res.status(200).json({
+                success:true,
+                msg:"Se creo el retorno del paciente",
+                resp
+            })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error);
+        }   
+    }
+    static async listRetornConsulta (req,res){
+        const {id_consulta} = req.params;
+        const verifyConsulta = await validateCosnulta(id_consulta);
+        if(verifyConsulta.success == false) return res.status(200).json(verifyConsulta);
+        try {
+            const resp = await retornoPaciente.findAll({
+                where:{id_consulta},
+                order: [
+                    ['createdAt', 'DESC'],
+                    /* ['name', 'ASC'], */
+                ],
+            });
+            res.status(200).json({
+                success:true,
+                msg:"Lista de retorno del paciente",
+                resp
+            })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error);
+        }
+    }
 }
 async function datas(motivo,enfermedadActual,diagPresuntivo,conducta,id_paciente,id_medico){
     if(!motivo) return {success:false,msg:"Motivo de consulta es obligatorio", name:'motivo'}
@@ -153,8 +204,9 @@ async function datas(motivo,enfermedadActual,diagPresuntivo,conducta,id_paciente
     if(!id_medico) return {success:false,msg:"No se esta mandando el id del medico", name:'id_medico'}
     const verifyMedico = await validateMedico(id_medico);
     if(verifyMedico.success == false) return verifyMedico
+    const verifyPaciente = await validatePaciente(id_paciente);
+    if(verifyPaciente.success == false) return verifyPaciente
     return {success:true,msg:"puedes continuar"}
-
 }
 async function validationPaciente(id_paciente){
     try {
@@ -193,5 +245,35 @@ async function getMedicoName(id_medico){
     } catch (error) {
         return {success:false,msg:"error 500"}
     }
+}
+async function validatePaciente(id_paciente){
+    try {
+        const resp = await paciente.findOne({
+            where:{id:id_paciente}
+        })
+        if(resp) return {success:true,msg:"Si existe el paciente"}
+        return {success:false,msg:"no existe ese paciente"}
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+}
+async function validateCosnulta(id_consulta){
+    try {
+        const resp = await consulta.findOne({
+            where:{id:id_consulta}
+        })
+        if(resp) return {success:true,msg:"Si existe el la consulta"}
+        return {success:false,msg:"no existe la consulta"}
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+}
+function validateDataRetorno(subjetivo,objetivo,diagnostico,tratamiento,signosVitales){
+    if(!subjetivo) return {success:false,msg:"Subjetivo es obligatorio", name:"subjetivo"};
+    if(!objetivo) return {success:false,msg:"Objetivo es obligatorio", name:"objetivo"};
+    if(!diagnostico) return {success:false,msg:"Diagnostico es obligatorio", name:"diagnostico"};
+    if(!tratamiento) return {success:false,msg:"Tratamiento es obligatorio", name:"tratamiento"};
+    if(!signosVitales) return {success:false,msg:"SignosVitales es obligatorio", name:"signosVitales"};
+    return {success:true,msg:"Puedes continuar"}
 }
 export default Consultas;

@@ -1,18 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
   const antcGinecoObst = sequelize.define('antcGinecoObst', {    
-    menarca: {
-      type: DataTypes.STRING      
-    },
     ritmo: DataTypes.STRING,
-    fmu: DataTypes.STRING,
-    gestaCesaria: DataTypes.STRING,
+    fum: DataTypes.STRING,
+    gesta: DataTypes.STRING,
+    partos: DataTypes.STRING,
+    cesarea: DataTypes.STRING,
     abortos: DataTypes.STRING,
-    nacidoVivos: DataTypes.STRING,
-    mortinatos: DataTypes.STRING,
-    plfcFamiliar: DataTypes.STRING,  
-    fecha: {
-      type:DataTypes.STRING,
-    },  
+    plfcFamiliar: DataTypes.STRING,    
+    resultado: DataTypes.STRING,  
     id_medico: {
       type: DataTypes.INTEGER,
       allowNull: {

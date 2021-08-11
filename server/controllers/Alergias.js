@@ -92,11 +92,11 @@ class Alergias{
         const {buscador,pagenumber,pagesize}= req.body;   
         const resp = await buscarAlergias(buscador);
         if(resp.success == false) return res.status(200).json(resp);
-        var pageNumber = pagenumber || 1;
+        var pageNumber = pagenumber || 0;
         var pageSize = pagesize || 8;
         var alergias = resp.alg
         var pageCount = Math.ceil(alergias.length / pageSize);
-        let pag = alergias.slice((pageNumber - 1)*pageSize, pageNumber * pageSize);
+        let pag = alergias.slice(pageNumber*pageSize, (pageNumber + 1) * pageSize);
         let datas = []
             for(let i = 0; i < pag.length; i++){
                 datas.push({
@@ -111,9 +111,106 @@ class Alergias{
             success:true,
             msg:"lista de alergias",
             pageCount,
+            pagenumber,
             resp:datas            
         });
     }
+    static async oneAlergia(req,res){
+        const {id_alergia}=req.params;
+        const verifyAlergia = validateAlergia(id_alergia);
+        if(verifyAlergia.success == false) return res.status(200).json(verifyAlergia);
+        try {
+            const resp = await alergias.findOne({
+                where:{id:id_alergia}
+            });
+            if(resp) return res.status(200).json({
+                success:true,
+                msg:"Existe Alergia",
+                resp
+            })
+            return res.status(200).json({
+                success:false,
+                msg:"No existe alergia"
+            })
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
+    static async updateAlergia(req,res){
+        const {nombre,descripcion}=req.body;  
+              
+        const {id_alergia}=req.params;
+        console.log(nombre != '')
+        if(nombre != ''){
+            const verifyNombre = await validatenombreAlg(nombre);
+            console.log(verifyNombre, 'esto es lo que quiero ver ffffff')
+            if(verifyNombre.success == false) return res.status(200).json(verifyNombre)
+        }
+        if(descripcion){
+            const verifyDescripcion = await validateDescripcionAlg(descripcion);
+            if(verifyDescripcion.success == false) return res.status(200).json(verifyDescripcion)
+        }
+        try {
+            const resp = await alergias.findOne({
+                where:{id:id_alergia}
+            })
+            if(resp){
+                const updatedata = await resp.update({
+                    nombre:nombre || resp.nombre,
+                    descripcion:descripcion || resp.descripcion
+                })
+                res.status(200).json({
+                    success:true,
+                    msg:'Se actualozo alergias',
+                    resp:updatedata
+                })
+            }else{
+                res.status(200).json({
+                    success:false,
+                    msg:'No existe esa alergia para poder actualizar'
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error)
+        }
+    }
+}
+async function validatenombreAlg (nombre){
+    console.log('nombre', nombre )    
+    
+    try {
+        const resp = await alergias.findOne({
+            where:{nombre:nombre} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado ese nombre",name:'nombre'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
+}
+async function validateDescripcionAlg (descripcion){
+    console.log('descripcion', descripcion )    
+    
+    try {
+        const resp = await alergias.findOne({
+            where:{descripcion} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado esa descripcion",name:'descripcion'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
 }
 async function validateMedico(id_medico){
     try {
@@ -181,7 +278,11 @@ async function existAlergiaPaciente(id_paciente, id_alergia){
 async function buscarAlergias (buscador){    
     try {
         const resp = await alergias.findAll({
-            attributes:['id','nombre','descripcion','id_medico']
+            attributes:['id','nombre','descripcion','id_medico'],
+            order: [
+                ['id', 'DESC'],
+                /* ['name', 'ASC'], */
+            ],
         });        
         const filter = resp.filter((data)=>{
             return data.nombre.toLowerCase().includes(buscador.toLowerCase()) ||

@@ -17,26 +17,36 @@ function permits(user, ruta){
             pacientes:'/api/pacientes',
             buscarPaciente:'/api/buscarPaciente',
             onePaciente:'/api/onePaciente/:id_paciente',
+            responsable:'/api/responsable/',
             //consulta paciente
             consulta:'/api/consulta/:id_paciente/:id_medico',
             oneConsulta:'/api/oneConsulta/:id_consulta',
             consultasMedico:'/api/consultasMedico/:id_medico',
+            retorno:'/api/retorno/',
             //Alergias
             alergias:'/api/alergias/:id_medico',
             pacienteAlergias:'/api/pacienteAlergias/:id_medico',
             buscarAlergia:'/api/buscarAlergia',
+            OneAlergia:'/api/OneAlergia/:id_alergia',
+            updateAlergia:'/api/updateAlergia/',            
             // transfuciones
             transfcion:'/api/transfcion/:id_medico',
             pacienteTransfuciones:'/api/pacienteTransfuciones/:id_medico',
             buscarTransfucion:'/api/buscarTransfucion',
+            oneTransfucion:'/api/oneTransfucion/:id_transfucion',
+            updateTransfucion:'/api/updateTransfucion/:id_transfucion',
             //cirugias previas
             cirugias:'/api/cirugias/:id_medico',
             pacienteCirugias:'/api/pacienteCirugias/:id_medico',
             buscarCirugia:'/api/buscarCirugia',
+            oneCirugia:'/api/oneCirugia/:id_cirugia',
+            updateCirugia:'/api/updateCirugia/:id_cirugia',
             //otras enfermedades
             otrEnfermedades:'/api/otrEnfermedades/:id_medico',
             pacienteEnfermedades:'/api/pacienteEnfermedades/',
             buscarEnfermedad:'/api/buscarEnfermedad',
+            oneOtraEnfermdad:'/api/oneOtraEnfermdad/:id_otrasEnf',
+            updateOtraEnfermedad:'/api/updateOtraEnfermedad/:id_otrasEnf',
             //antecedentes no patologicos
             antecedentesNoPtl:'/api/antecedentesNoPtl/:id_medico/:id_paciente',
             antNoPtlPaciente:'/api/antNoPtlPaciente/:id_paciente/:id_medico',
@@ -81,7 +91,10 @@ function permits(user, ruta){
             totalMEdicos:'/api/totalMEdicos',
             pacientesR:'/api/pacientesR',
             vacunadosCovid:'/api/vacunadosCovid',
-            porcentajeVacunadosC19:'/api/porcentajeVacunadosC19'
+            porcentajeVacunadosC19:'/api/porcentajeVacunadosC19',
+            //alergias
+            buscarAlergia:'/api/buscarAlergia',
+            OneAlergia:'/api/OneAlergia/:id_alergia',
         }
         if(rutaUser[r]){
             return true;

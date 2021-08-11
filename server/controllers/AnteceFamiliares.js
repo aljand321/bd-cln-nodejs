@@ -6,7 +6,7 @@ import model from '../models';
     static async create(req,res){
         const { padre,madre,hnos } = req.body;
         const { id_paciente, id_medico } = req.params;
-        console.log(req.body,' asdasd')
+
         const verifyMEdico = await validateMedico(id_medico);
         if(verifyMEdico.success == false) return res.status(200).json(verifyMEdico);
         const verifyPaciente = await validatePaciente(id_paciente);

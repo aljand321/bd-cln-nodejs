@@ -76,6 +76,9 @@ module.exports = (sequelize, DataTypes) => {
     paciente.hasMany(models.antcPersonalesNoPtl, {
       foreignKey: 'id_paciente',
     });
+    paciente.hasMany(models.antPediatricos, {
+      foreignKey: 'id_paciente',
+    });
     paciente.belongsToMany(models.alergias,{
       through:'algPaciente',
       as: 'alergias',

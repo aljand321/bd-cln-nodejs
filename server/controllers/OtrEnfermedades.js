@@ -89,11 +89,11 @@ class OtrEnfermedades{
         const {buscador,pagenumber,pagesize}= req.body;   
         const resp = await buscarEnf(buscador);
         if(resp.success == false) return res.status(200).json(resp);
-        var pageNumber = pagenumber || 1;
+        var pageNumber = pagenumber || 0;
         var pageSize = pagesize || 8;
         var enf = resp.alg
         var pageCount = Math.ceil(enf.length / pageSize);
-        let pag = enf.slice((pageNumber - 1)*pageSize, pageNumber * pageSize);
+        let pag = enf.slice(pageNumber*pageSize, (pageNumber + 1) * pageSize);
         let datas = []
             for(let i = 0; i < pag.length; i++){
                 datas.push({
@@ -108,39 +108,100 @@ class OtrEnfermedades{
             success:true,
             msg:"lista de enfermedades",
             pageCount,
+            pagenumber,
             resp:datas            
         });    
-        /* try {
-            const resp = await OtrasEnfermedades.findAll({
-                limit : 8,
-                offset: 0,
-                where:{                    
-                    [Op.or]: [
-                        {nombre:{ [Op.iLike]: `${buscador}%`}},
-                        {descripcion:{ [Op.iLike]: `${buscador}%`}}                        
-                    ]                    
-                },
-                attributes:['id','nombre','descripcion','id_medico']
+    }
+    static async oneOtrEnf(req,res){
+        const {id_otrasEnf}=req.params;
+        const verifyOtraEnf = validateEnf(id_otrasEnf);
+        if(verifyOtraEnf.success == false) return res.status(200).json(verifyOtraEnf);
+        try {
+            const resp = await OtrasEnfermedades.findOne({
+                where:{id:id_otrasEnf}
             });
-            let datas = []
-            for(let i = 0; i < resp.length; i++){
-                datas.push({
-                    id:resp[i].id,
-                    nombre:resp[i].nombre,
-                    descripcion:resp[i].descripcion,
-                    id_medico:resp[i].id_medico,
-                    selected:false
-                })
-            }
-            res.status(200).json({
+            if(resp) return res.status(200).json({
                 success:true,
-                msg:"Lista de enfermedades",
-                resp:datas
+                msg:"Existe",
+                resp
+            })
+            return res.status(200).json({
+                success:false,
+                msg:"No existe"
             })
         } catch (error) {
             res.status(500).json(error)
-        } */
+        }
     }
+    static async updateOtrEnf(req,res){
+        const {nombre,descripcion}=req.body;                
+        const {id_otrasEnf}=req.params;
+
+        if(nombre != ''){
+            const verifyNombre = await validatenombre(nombre);
+            if(verifyNombre.success == false) return res.status(200).json(verifyNombre)
+        }
+        if(descripcion){
+            const verifyDescripcion = await validateDescripcion(descripcion);
+            if(verifyDescripcion.success == false) return res.status(200).json(verifyDescripcion)
+        }
+        try {
+            const resp = await OtrasEnfermedades.findOne({
+                where:{id:id_otrasEnf}
+            })
+            if(resp){
+                const updatedata = await resp.update({
+                    nombre:nombre || resp.nombre,
+                    descripcion:descripcion || resp.descripcion
+                })
+                res.status(200).json({
+                    success:true,
+                    msg:'Se actualizo los datos',
+                    resp:updatedata
+                })
+            }else{
+                res.status(200).json({
+                    success:false,
+                    msg:'No hay nada para poder actualizar'
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error)
+        }
+    }
+}
+async function validatenombre(nombre){  
+    try {
+        const resp = await OtrasEnfermedades.findOne({
+            where:{nombre:nombre} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado ese nombre",name:'nombre'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
+}
+async function validateDescripcion(descripcion){
+    try {
+        const resp = await OtrasEnfermedades.findOne({
+            where:{descripcion} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado esa descripcion",name:'descripcion'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
 }
 async function validateMedico(id_medico){
     try {
@@ -209,7 +270,11 @@ async function existCirugiaPaciente(id_paciente, id_otrasEnf){
 async function buscarEnf (buscador){    
     try {
         const resp = await OtrasEnfermedades.findAll({
-            attributes:['id','nombre','descripcion','id_medico']
+            attributes:['id','nombre','descripcion','id_medico'],
+            order: [
+                ['id', 'DESC'],
+                /* ['name', 'ASC'], */
+            ],
         });        
         const filter = resp.filter((data)=>{
             return data.nombre.toLowerCase().includes(buscador.toLowerCase()) ||

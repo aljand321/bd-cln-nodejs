@@ -1,38 +1,29 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('antcGinecoObsts', {
+    await queryInterface.createTable('retornoPacientes', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
-      },      
-      ritmo: {
-        type: Sequelize.STRING
       },
-      fum: {
-        type: Sequelize.STRING
+      subjetivo: {
+        type: Sequelize.TEXT
       },
-      gesta: {
-        type: Sequelize.STRING
+      objetivo: {
+        type: Sequelize.TEXT
       },
-      partos: {
-        type: Sequelize.STRING
+      diagnostico: {
+        type: Sequelize.TEXT
       },
-      cesarea: {
-        type: Sequelize.STRING
+      tratamiento: {
+        type: Sequelize.TEXT
       },
-      abortos: {
-        type: Sequelize.STRING
+      signosVitales: {
+        type: Sequelize.JSON
       },
-      plfcFamiliar: {
-        type: Sequelize.STRING
-      },      
-      resultado:{
-        type:Sequelize.STRING
-      },
-      id_medico:{
+      id_medico: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {
@@ -41,13 +32,13 @@ module.exports = {
           as: 'id_medico',
         }
       },
-      id_paciente: {
+      id_consulta: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {
-          model: 'pacientes',
+          model: 'consulta',
           key: 'id',
-          as: 'id_paciente',
+          as: 'id_consulta',
         }
       },
       createdAt: {
@@ -61,6 +52,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('antcGinecoObsts');
+    await queryInterface.dropTable('retornoPacientes');
   }
 };

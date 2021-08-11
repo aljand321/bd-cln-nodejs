@@ -91,11 +91,11 @@ class Transfuciones{
         const {buscador,pagenumber,pagesize}= req.body;   
         const resp = await buscarTransfucion(buscador);
         if(resp.success == false) return res.status(200).json(resp);
-        var pageNumber = pagenumber || 1;
+        var pageNumber = pagenumber || 0;
         var pageSize = pagesize || 8;
         var tr = resp.alg
         var pageCount = Math.ceil(tr.length / pageSize);
-        let pag = tr.slice((pageNumber - 1)*pageSize, pageNumber * pageSize);
+        let pag = tr.slice(pageNumber*pageSize, (pageNumber + 1) * pageSize);
         let datas = []
             for(let i = 0; i < pag.length; i++){
                 datas.push({
@@ -110,9 +110,100 @@ class Transfuciones{
             success:true,
             msg:"Lista de Transfuciones",
             pageCount,
+            pagenumber,
             resp:datas            
         });        
     }
+    static async oneTransfucion(req,res){
+        const {id_transfucion}=req.params;
+        const verifyCirugia = validateTransfucion(id_transfucion);
+        if(verifyCirugia.success == false) return res.status(200).json(verifyCirugia);
+        try {
+            const resp = await transfuciones.findOne({
+                where:{id:id_transfucion}
+            });
+            if(resp) return res.status(200).json({
+                success:true,
+                msg:"Existe Transfucion",
+                resp
+            })
+            return res.status(200).json({
+                success:false,
+                msg:"No existe Transfucion"
+            })
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
+    static async updateTransfucion(req,res){
+        const {nombre,descripcion}=req.body;                
+        const {id_transfucion}=req.params;
+
+        if(nombre != ''){
+            const verifyNombre = await validatenombre(nombre);
+            if(verifyNombre.success == false) return res.status(200).json(verifyNombre)
+        }
+        if(descripcion){
+            const verifyDescripcion = await validateDescripcion(descripcion);
+            if(verifyDescripcion.success == false) return res.status(200).json(verifyDescripcion)
+        }
+        try {
+            const resp = await transfuciones.findOne({
+                where:{id:id_transfucion}
+            })
+            if(resp){
+                const updatedata = await resp.update({
+                    nombre:nombre || resp.nombre,
+                    descripcion:descripcion || resp.descripcion
+                })
+                res.status(200).json({
+                    success:true,
+                    msg:'Se actualizo los datos',
+                    resp:updatedata
+                })
+            }else{
+                res.status(200).json({
+                    success:false,
+                    msg:'No hay nada para poder actualizar'
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error)
+        }
+    }
+}
+async function validatenombre(nombre){  
+    try {
+        const resp = await transfuciones.findOne({
+            where:{nombre:nombre} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado ese nombre",name:'nombre'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
+}
+async function validateDescripcion(descripcion){
+    try {
+        const resp = await transfuciones.findOne({
+            where:{descripcion} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado esa descripcion",name:'descripcion'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
 }
 async function validateMedico(id_medico){
     try {
@@ -181,7 +272,11 @@ async function existTransfucionPaciente(id_paciente, id_transfucion){
 async function buscarTransfucion(buscador){    
     try {
         const resp = await transfuciones.findAll({
-            attributes:['id','nombre','descripcion','id_medico']
+            attributes:['id','nombre','descripcion','id_medico'],
+            order: [
+                ['id', 'DESC'],
+                /* ['name', 'ASC'], */
+            ],
         });        
         const filter = resp.filter((data)=>{
             return data.nombre.toLowerCase().includes(buscador.toLowerCase()) ||

@@ -4,27 +4,25 @@ const { antcGinecoObst,paciente,medicoUser } = model;
 
 class AntGinecoObst {
   static async create(req, res) {
-    const {fecha,menarca,ritmo,fmu,gestaCesaria,abortos,nacidoVivos,mortinatos, plfcFamiliar} = req.body;
+    const {ritmo,fum,gesta,partos,cesarea,abortos,plfcFamiliar} = req.body;
     const { id_paciente,id_medico } = req.params;
     console.log(req.body, 'esto es lo que quiero ver')
     const verifyMEdico = await validateMedico(id_medico);
     if(verifyMEdico.success == false) return res.status(200).json(verifyMEdico);
     const verifyPaciente = await validatePaciente(id_paciente);
     if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente); 
-    const verifyDatas = validateDatas(fecha,menarca,ritmo,fmu,gestaCesaria,abortos,nacidoVivos,mortinatos, plfcFamiliar);
+    const verifyDatas = validateDatas(ritmo,fum,gesta,partos,cesarea,abortos,plfcFamiliar);
     if(verifyDatas.success == false) return res.status(200).json(verifyDatas); 
     
     try {
       const resp = await antcGinecoObst.create({
-        menarca,
         ritmo,
-        fmu,
-        gestaCesaria,
+        fum,
+        gesta,
+        partos,
+        cesarea,
         abortos,
-        nacidoVivos,
-        mortinatos,
         plfcFamiliar,
-        fecha,
         id_paciente,
         id_medico
       });
@@ -82,17 +80,15 @@ class AntGinecoObst {
     }
   }
 }
-async function validateDatas(fecha,menarca,ritmo,fmu,gestaCesaria,abortos,nacidoVivos,mortinatos,plfcFamiliar){
-    if(!fecha)return {success:false, msg:"Fecha no se esta mandando"};
-    if(!menarca)return {success:false, msg:"Menarca no se esta mandando"};
-    if(!ritmo)return {success:false, msg:"la fecha no se esta mandando"};
-    if(!fmu)return {success:false, msg:"la fecha no se esta mandando"};
-    if(!gestaCesaria)return {success:false, msg:"la fecha no se esta mandando"};
-    if(!abortos)return {success:false, msg:"la fecha no se esta mandando"};
-    if(!nacidoVivos)return {success:false, msg:"la fecha no se esta mandando"};
-    if(!mortinatos)return {success:false, msg:"la fecha no se esta mandando"};
-    if(!plfcFamiliar)return {success:false, msg:"la fecha no se esta mandando"};
-    return {success:true,msg:"puedes continuar"}    
+async function validateDatas(ritmo,fum,gesta,partos,cesarea,abortos,plfcFamiliar){
+  if(!ritmo)return {success:false, msg:"Ritmo es obligatorio"};
+  if(!fum)return {success:false, msg:"FUM. es obligarorio"};
+  if(!gesta)return {success:false, msg:"Gesta es obligarorio"};
+  if(!partos)return {success:false, msg:"Partos es obligarorio"};
+  if(!cesarea)return {success:false, msg:"Cesarea es obligarorio"};
+  if(!abortos)return {success:false, msg:"Abortos es obligarorio"};
+  if(!plfcFamiliar)return {success:false, msg:"Metodos de planificacion familiar es obligarorio"};
+  return {success:true,msg:"puedes continuar"}    
 }
 async function validatePaciente(id_paciente){    
   if(!id_paciente) return {success:false,msg:"id del paciente no se esta mandando"}

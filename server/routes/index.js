@@ -11,6 +11,7 @@ import AntecedentesFamiliares from "../controllers/AnteceFamiliares";
 import ExamenFisico from "../controllers/exmFisico";
 import AntGinecoObst from "../controllers/AntcGinecoObst";
 import Vacunas from "../controllers/Vacunas";
+import AntPediatricos from '../controllers/AntPedriaticos';
 export default (app) => {
   app.get("/api", (req, res) =>
     res.status(200).send({
@@ -42,42 +43,52 @@ export default (app) => {
   
 
   //paciente
-  app.post('/api/paciente/:id_medico',Paciente.create);
-  app.get('/api/pacientes',Paciente.list);
+  app.post('/api/paciente/:id_medico',Paciente.create); 
   app.post('/api/buscarPaciente', Paciente.buscarPaciente);
   app.post('/api/pagination/', Paciente.pagination);
-  app.get('/api/onePaciente/:id_paciente', Paciente.onePaciente)
+  app.get('/api/onePaciente/:id_paciente', Paciente.onePaciente);
+  //responsable
+  app.post('/api/responsable/:id_medico', Paciente.responsable);
+  app.get('/api/responsable/:id_paciente', Paciente.listRespPaciente);
 
   //consulta paciente
   app.post('/api/consulta/:id_paciente/:id_medico', Consultas.create);
   app.get('/api/consulta/:id_paciente/:id_medico', Consultas.consultaPaciente);
   app.get('/api/oneConsulta/:id_consulta', Consultas.oneConsulta);
   app.get('/api/consultasMedico/:id_medico', Consultas.consultaMEdico);
+  //Retorno
+  app.post('/api/retorno/:id_medico/:id_consulta', Consultas.createRetorno);
+  app.get('/api/retorno/:id_consulta', Consultas.listRetornConsulta);
 
   //alergias
   app.post('/api/alergias/:id_medico', Alergias.create);
   app.post('/api/pacienteAlergias/:id_medico', Alergias.createAlgPaciente);
   app.get('/api/pacienteAlergias/:id_paciente/:id_medico', Alergias.listALgPaciente);
   app.post('/api/buscarAlergia', Alergias.buscarAlergia);
+  app.get('/api/OneAlergia/:id_alergia',Alergias.oneAlergia);
+  app.put('/api/updateAlergia/:id_alergia',Alergias.updateAlergia);
 
   // transfuciones
   app.post('/api/transfcion/:id_medico',Transfuciones.create);
   app.post('/api/pacienteTransfuciones/:id_medico', Transfuciones.createTransfucionPaciente);
   app.get('/api/pacienteTransfuciones/:id_paciente/:id_medico', Transfuciones.listTransfucionesPaciente);
   app.post('/api/buscarTransfucion', Transfuciones.buscarTransfucion);
-
+  app.get('/api/oneTransfucion/:id_transfucion', Transfuciones.oneTransfucion);
+  app.put('/api/updateTransfucion/:id_transfucion',Transfuciones.updateTransfucion);
   //cirugias previas
   app.post('/api/cirugias/:id_medico',Cirugias.create);
   app.post('/api/pacienteCirugias/:id_medico', Cirugias.createCirugiasPaciente);
   app.get('/api/pacienteCirugias/:id_paciente/:id_medico', Cirugias.listCirugiasPaciente);
   app.post('/api/buscarCirugia', Cirugias.buscarCirugia);
-
+  app.get('/api/oneCirugia/:id_cirugia', Cirugias.oneCirugia);
+  app.put('/api/updateCirugia/:id_cirugia',Cirugias.updateCirugia);
   //otras enfermedades
   app.post('/api/otrEnfermedades/:id_medico',OtrEnfermedades.create);
   app.post('/api/pacienteEnfermedades/:id_medico', OtrEnfermedades.createOtrEnfPaciente);
   app.get('/api/pacienteEnfermedades/:id_paciente/:id_medico', OtrEnfermedades.listEnfPaciente);
   app.post('/api/buscarEnfermedad', OtrEnfermedades.buscarEnf);
-
+  app.get('/api/oneOtraEnfermdad/:id_otrasEnf', OtrEnfermedades.oneOtrEnf);
+  app.put('/api/updateOtraEnfermedad/:id_otrasEnf',OtrEnfermedades.updateOtrEnf);
   //antecedentes no patologicos
   app.post('/api/antecedentesNoPtl/:id_medico/:id_paciente', AntcPersonNoPatologicos.create);
   app.get('/api/antNoPtlPaciente/:id_paciente/:id_medico', AntcPersonNoPatologicos.list);
@@ -102,6 +113,10 @@ export default (app) => {
   app.get('/api/vacunaPaciente/:id_paciente/:id_medico', Vacunas.listVacunasPaciente);
   app.post('/api/buscarVacuna', Vacunas.buscador);
 
+  //antecedentes pediatricos
+  app.post('/api/createAntPedriaticos/:id_medico/:id_paciente', AntPediatricos.create);
+  app.get('/api/antPediatricos/:id_paciente/:id_medico',AntPediatricos.lisAntPediatricos)
+
 };
 
 //sequelize model:create --name peronal --attributes nombre:string,apellidos:string,ci:string,telefono:integer,direccion:string,edad:date,img:string,profecion:string,especialidad:string,fechaDeContrato:string
@@ -124,11 +139,20 @@ export default (app) => {
 //sequelize model:create --name crPaciente --attributes id_paciente:integer,id_cirugiaP:integer,id_medico:integer
 //sequelize model:create --name otrasEnfPaciente --attributes id_paciente:integer,id_otrasEnf:integer,id_medico:integer
 
+//responsables del paciente
+
+//sequelize model:create --name responsable --attributes nombres:string,apellidos:string,ci:string,telefono:string,direccion:string,id_paciente:integer,id_medico:integer
+//sequelize model:create --name responsablePaciente --attributes descripcion:text,id_responsable:integer,id_paciente:integer,id_medico:integer
+//sequelize model:create --name retornoPaciente --attributes subjetivo:text,objetivo:text,diagnostico:text,tratamiento:text,id_medico:integer,id_consulta:integer
+
 //sequelize model:create --name examenFisico --attributes cabeza:text,cuello:text,torax:text,pulmones:text,corazon:text,abdomen:text,ginecoUrinario:text,locomotor:text,neurologico:text,pielyFaneras:text
 
 //sequelize model:create --name vacunas --attributes nombre:string,descripcion:text,id_medico:integer
 
 //sequelize model:create --name vacunasPaciente --attributes fecha:date,id_paciente:integer,id_vacuna:integer,id_medico:integer
+
+//antecedentes pedriatricos
+//sequelize model:create --name antPediatricos --attributes pesoRn:string,tipodeParto:string,obsPerinatales:string,id_paciente:integer,id_medico:integer
 
 
 

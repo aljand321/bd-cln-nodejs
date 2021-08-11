@@ -89,7 +89,7 @@ class Vacunas {
     }
     static async buscador(req,res){
         const {pagenumber,pagesize,buscador}= req.body
-        console.log(req.body)
+       
         const allP = await all(buscador);
         if(allP.success == false)return res.status(200).json(allP)
         var pageNumber=pagenumber || 1; 
