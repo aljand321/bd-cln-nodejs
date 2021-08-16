@@ -47,6 +47,8 @@ export default (app) => {
   app.post('/api/buscarPaciente', Paciente.buscarPaciente);
   app.post('/api/pagination/', Paciente.pagination);
   app.get('/api/onePaciente/:id_paciente', Paciente.onePaciente);
+  app.get('/api/AntPaciente/:id_paciente', Paciente.getAntpaciente);
+  app.put('/api/updatePaciente/:id_paciente',Paciente.updatePaciente);
   //responsable
   app.post('/api/responsable/:id_medico', Paciente.responsable);
   app.get('/api/responsable/:id_paciente', Paciente.listRespPaciente);
@@ -112,6 +114,9 @@ export default (app) => {
   app.post('/api/vacunaPaciente/:id_medico', Vacunas.createVacunaPaciente);
   app.get('/api/vacunaPaciente/:id_paciente/:id_medico', Vacunas.listVacunasPaciente);
   app.post('/api/buscarVacuna', Vacunas.buscador);
+  app.post('/api/listVacunasPaciente',Vacunas.listVacunasP);
+  app.get('/api/oneVacuna/:id_vacuna',Vacunas.oneVacuna);
+  app.put('/api/updateVacuna/:id_vacuna',Vacunas.updateVacunas);
 
   //antecedentes pediatricos
   app.post('/api/createAntPedriaticos/:id_medico/:id_paciente', AntPediatricos.create);

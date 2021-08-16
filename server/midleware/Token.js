@@ -17,12 +17,17 @@ function permits(user, ruta){
             pacientes:'/api/pacientes',
             buscarPaciente:'/api/buscarPaciente',
             onePaciente:'/api/onePaciente/:id_paciente',
+            AntPaciente:'/api/AntPaciente',
+            updatePaciente:'/api/updatePaciente',
+            //responsable
             responsable:'/api/responsable/',
+            
+            //retorno
+            retorno:'/api/retorno',
             //consulta paciente
             consulta:'/api/consulta/:id_paciente/:id_medico',
             oneConsulta:'/api/oneConsulta/:id_consulta',
             consultasMedico:'/api/consultasMedico/:id_medico',
-            retorno:'/api/retorno/',
             //Alergias
             alergias:'/api/alergias/:id_medico',
             pacienteAlergias:'/api/pacienteAlergias/:id_medico',
@@ -64,7 +69,10 @@ function permits(user, ruta){
             //vacunas
             createVacuna:'/api/createVacuna/:id_medico',
             vacunaPaciente:'/api/vacunaPaciente/', 
-            buscarVacuna:'/api/buscarVacuna/'
+            buscarVacuna:'/api/buscarVacuna/',
+            listVacunasPaciente:'/api/listVacunasPaciente',
+            oneVacuna:'/api/oneVacuna',
+            updateVacuna:'/api/updateVacuna'
 
         }
         if(rutaMedico[r]){

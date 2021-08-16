@@ -7,6 +7,7 @@ const Op = Sequelize.Op;
 
 //const { medicoUser } = model;
 const { paciente,responsablePaciente,medicoUser } = model;
+//const { alergias,algPaciente } = model;
 
 class Paciente {
     static async create(req,res){
@@ -186,7 +187,228 @@ class Paciente {
             res.status(500).json(error);
         }
     }
+    static async getAntpaciente (req,res){
+        const{id_paciente} = req.params;
+        const verifyPaciente = await validatePaciente(id_paciente);
+        if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente)
+        const alergiasR = await alergiasPaciente(id_paciente);
+        if(alergiasR.success == false) return res.status(200).json(alergiasR)
+        const transfuciones = await trPacientes(id_paciente);
+        if(transfuciones.success == false) return res.status(200).json(transfuciones)
+        const cirugiasP = await cirugias(id_paciente);
+        if(cirugiasP.success == false) return res.status(200).json(cirugiasP)
+        const enf = await otrasEnf(id_paciente);
+        if(enf.success == false) return res.status(200).json(enf)
+        const vacunas = await vacunasPacientes(id_paciente);
+        if(vacunas.success == false) return res.status(200).json(vacunas)
+        const antNoPtl = await antPlNoPatologicos(id_paciente);
+        if(antNoPtl.success == false) return res.status(200).json(antNoPtl)
+        const antFml = await antFamiliares(id_paciente);
+        if(antFml.success == false) return res.status(200).json(antFml)
+        const exmFisico = await examenFisico(id_paciente);
+        if(exmFisico.success == false) return res.status(200).json(exmFisico)
+        const antPediat = await antPediatricos(id_paciente);
+        if(antPediat.success == false) return res.status(200).json(antPediat)
+        const antGincoObs = await antGncObs(id_paciente);
+        if(antGincoObs.success == false) return res.status(200).json(antGincoObs)
+        res.status(200).json({
+            success:true,
+            msg:'Antecedentes del paciente',
+            resp:{
+                paciente:verifyPaciente.resp.sexo,
+                alergias:alergiasR.resp,
+                transfuciones:transfuciones.resp,
+                cirugias:cirugiasP.resp,
+                enfermedades:enf.resp,
+                vacunas:vacunas.resp,
+                antNoPtl:antNoPtl.resp,
+                antFamilires:antFml.resp,
+                exmFisico:exmFisico.resp,
+                antPediatricos:antPediat.resp,
+                antGincoObs:antGincoObs.resp
+            }
+        })
+        
+    }
+    static async updatePaciente(req,res){
+        const {id_paciente} = req.params;
+        const { nombres,apellidos,sexo,ci,telefono,direccion,edad,ocupacion } = req.body;
+        const verifyPaciente = await validatePaciente(id_paciente);
+        if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
+        if(ci || telefono){
+            const validateCiTelf = await validateCiTelfono(ci,telefono);
+            if(validateCiTelf.success == false)return res.status(200).json(validateCiTelf);
+        }
+        try {
+            const resp = await paciente.findOne({
+                where:{id:id_paciente}
+            })
+            if(!resp)return res.status(200).json({success:false,msg:'No hay paciente para poder actualizar'})
+            const updateData = await resp.update({
+                nombres:nombres || resp.nombres,
+                apellidos:apellidos || resp.apellidos,
+                sexo:sexo || resp.sexo,
+                ci:ci || resp.ci,
+                telefono:telefono || resp.telefono,
+                direccion:direccion || resp.direccion,
+                edad:edad || resp.edad,
+                ocupacion:ocupacion || resp.ocupacion
+            })
+            return res.status(200).json({
+                success:true,
+                msg:'Datos del paciente actualizado',
+                updateData
+            })
+        } catch (error) {
+            console.log(error)
+            res.status(200).json(error)
+        } 
+    }
 }
+async function antGncObs(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select *
+            from "antcGinecoObsts"
+            where id_paciente = ${id_paciente}
+        `)                
+        return {success:true,msg:'Lista de antecedentes gineco obstetricos del paciente',resp:resp[0]}        
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+async function antPlNoPatologicos(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select instruccion,fuma,bebe,alimentacion,"createdAt"
+            from "antcPersonalesNoPtls"
+            where id_paciente = ${id_paciente}
+        `)
+        let arr = []
+        for(let i = 0; i < resp[0].length; i++){
+            arr.push({
+                instruccion:resp[0][i].instruccion,
+                fuma: JSON.parse(resp[0][i].fuma),
+                bebe: JSON.parse(resp[0][i].bebe),
+                alimentacion:resp[0][i].alimentacion,
+                createdAt:resp[0][i].createdAt
+            })
+        }
+        return {success:true,msg:'Antecedentes no patologicos del paciente',resp:arr}        
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+async function antFamiliares(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select padre,madre,hnos,"createdAt"
+            from "antcFamiliares"
+            where id_paciente = ${id_paciente}
+        `)                
+        return {success:true,msg:'Antecedentes no patologicos del paciente',resp:resp[0]}        
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+async function examenFisico(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select *
+            from "examenFisicos"
+            where id_paciente = ${id_paciente}
+        `)                
+        return {success:true,msg:'Lista de examenes fisicos del paciente',resp:resp[0]}        
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+async function antPediatricos(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select "pesoRn","tipodeParto","obsPerinatales","createdAt"
+            from "antPediatricos"
+            where id_paciente = ${id_paciente}
+            order by id desc
+        `)                
+        return {success:true,msg:'Antecedentes Pediatricos del Paciente',resp:resp[0]}        
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+async function vacunasPacientes(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select Vc.nombre "vacuna", count(*) "dosis"
+            from "vacunasPacientes" Vcp, "vacunas" Vc
+            where Vcp.id_paciente = ${id_paciente} and Vc.id = Vcp.id_vacuna
+            group by Vc.nombre
+        `)
+        return {success:true,msg:'Lista de vacunas del paciente',resp:resp[0]}        
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+async function alergiasPaciente(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select Al.nombre "alergia"
+            from "alergias" Al, "algPacientes" Alp, "pacientes" Pa
+            where Al.id = Alp.id_alergia and Alp.id_paciente = Pa.id and Pa.id = ${id_paciente}
+        `)
+        return {success:true,msg:'Lista de alergias del paciente',resp:resp[0]}        
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+async function trPacientes(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select Tr.nombre "transfucion"
+            from "pacientes" Pa,"trPacientes" Trp,"transfuciones" Tr
+            where Pa.id = Trp.id_paciente and Tr.id = Trp.id_transfucion and Pa.id = ${id_paciente}
+        `)
+        return {success:true,msg:'Lista de transfuciones del paciente',resp:resp[0]}       
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    }
+}
+
+async function cirugias(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select Cr.nombre "cirugia"
+            from "pacientes" Pa,"cirugiasPrevias" Cr,"crPacientes" Crpt
+            where Pa.id = Crpt.id_paciente and  Crpt."id_cirugiaP" = Cr.id and Pa.id = ${id_paciente}
+        `)
+        return {success:true,msg:'Lista de cirugias del paciente',resp:resp[0]}       
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    } 
+}
+async function otrasEnf(id_paciente){
+    try {
+        const resp = await sq.sequelize.query(`
+            select Ot.nombre "otrasEnf"
+            from "pacientes" Pa,"OtrasEnfermedades" Ot,"otrasEnfPacientes" Otrp
+            where Pa.id = Otrp.id_paciente and  Otrp."id_otrasEnf" = Ot.id and Pa.id = ${id_paciente}
+        `)
+        return {success:true,msg:'Lista de otras enfermedades del paciente',resp:resp[0]}       
+    } catch (error) {
+        console.log(error)
+        return {success:false,msg:'error 500'}
+    } 
+}
+
 async function validateDatas(nombres,apellidos,sexo,direccion,edad,ocupacion,id_medico,ci,telefono){
     if(!nombres)return {success:false,msg:"Nombre del paciente es obligatorio",name:"nombres"};
     if(!apellidos)return {success:false,msg:"Apellido del paciente es obligatorio",name:"apellidos"};
@@ -217,7 +439,7 @@ async function validateCiTelfono(ci,telefono){
             }
             return {success:true,msg:"Puedes continuar"}
         } catch (error) {
-            console.log(error, 'kjhkjhkjhkjhkjhkhkjhkjh')
+            console.log(error)
             return {success:false,msg:"error 500",error}
         }
     }else{
@@ -229,7 +451,7 @@ async function getUsers (buscador){
     console.log(buscador)
     try {
         const resp = await sq.sequelize.query(`
-            select id, nombres,apellidos,sexo,ci,telefono,direccion,date_part('year',age(now(),"edad")) "edad",ocupacion
+            select id, nombres,apellidos,sexo,ci,telefono,direccion,date_part('year',age(now(),"edad")) "edad",ocupacion,"createdAt"
             from "pacientes"
             order by id desc
         `)
@@ -287,4 +509,5 @@ async function validateResponsable(id_paciente,id_responsable){
         return {success:false,msg:"error 500"};
     }
 }
+
 export default Paciente;

@@ -107,6 +107,121 @@ class Vacunas {
             
         });          
     }
+    static async listVacunasP(req,res){
+        const {pagenumber,pagesize,buscador}= req.body       
+        const allP = await all(buscador);
+        if(allP.success == false)return res.status(200).json(allP)
+        var pageNumber=pagenumber || 0; 
+        var pageSize=pagesize||8; 
+        var vacunas = allP.resp
+        var pageCount =Math.ceil(vacunas.length/pageSize);           
+        let pag = vacunas.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
+        res.status(200).json({
+            success:true,
+            msg:"Lista de vacunas",
+            resp:pag,
+            pageCount,
+            pagenumber,
+            
+        });          
+    }
+    static async oneVacuna(req,res){
+        const {id_vacuna}=req.params;
+        const verifyVacuna = await validateVacuna(id_vacuna);
+        if(verifyVacuna.success == false) return res.status(200).json(verifyVacuna);
+        try {
+            const resp = await vacunas.findOne({
+                where:{id:id_vacuna}
+            });
+            if(resp) return res.status(200).json({
+                success:true,
+                msg:"Existe Vacuna",
+                resp
+            })
+            return res.status(200).json({
+                success:false,
+                msg:"No existe esa vacuna"
+            })
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
+    static async updateVacunas(req,res){
+        const {nombre,descripcion}=req.body;                
+        const {id_vacuna}=req.params;
+        const verifyVacuna = await validateVacuna(id_vacuna);
+        if(verifyVacuna.success == false) return res.status(200).json(verifyVacuna);
+        console.log(nombre != '')
+        if(nombre != ''){
+            const verifyNombre = await validatenombre(nombre);
+            console.log(verifyNombre, 'esto es lo que quiero ver ffffff')
+            if(verifyNombre.success == false) return res.status(200).json(verifyNombre)
+        }
+        if(descripcion){
+            const verifyDescripcion = await validateDescripcion(descripcion);
+            if(verifyDescripcion.success == false) return res.status(200).json(verifyDescripcion)
+        }
+        try {
+            const resp = await vacunas.findOne({
+                where:{id:id_vacuna}
+            })
+            if(resp){
+                const updatedata = await resp.update({
+                    nombre:nombre || resp.nombre,
+                    descripcion:descripcion || resp.descripcion
+                })
+                res.status(200).json({
+                    success:true,
+                    msg:'Se actualizo vacuna',
+                    resp:updatedata
+                })
+            }else{
+                res.status(200).json({
+                    success:false,
+                    msg:'No existe esa alergia para poder actualizar'
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error)
+        }
+    }
+}
+async function validatenombre (nombre){
+    console.log('nombre', nombre )    
+    
+    try {
+        const resp = await vacunas.findOne({
+            where:{nombre:nombre} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado ese nombre",name:'nombre'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
+}
+async function validateDescripcion (descripcion){
+    console.log('descripcion', descripcion )    
+    
+    try {
+        const resp = await vacunas.findOne({
+            where:{descripcion} 
+        });                        
+        console.log(resp,'esto es lo que quiro ver')
+        if(resp){
+            return {success:false,msg:"Ya esta registrado esa descripcion",name:'descripcion'}
+        }else{
+            return {success:true,msg:'Puedes continuar'}
+        }
+    } catch (error) {
+        return {success:false,msg:"error 500"}
+    }
+    
 }
 async function validateMedico(id_medico){
     try {
@@ -176,7 +291,12 @@ async function existVacunaPaciente(id_paciente, id_vacuna, description){
 
 async function all(buscador){
     try {
-        const resp = await vacunas.findAll();
+        const resp = await vacunas.findAll({
+            order: [
+                ['id', 'DESC'],
+                /* ['name', 'ASC'], */
+            ],
+        });
 
         var filtrar = resp.filter((item)=>{
             return item.nombre.toLowerCase().includes(buscador.toLowerCase())||
