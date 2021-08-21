@@ -6,7 +6,7 @@ const { examenFisico,paciente,medicoUser } = model;
 
 class ExamenFisico{
     static async create (req,res){
-        const { cabeza,cuello,torax,pulmones,corazon,abdomen,ginecoUrinario,locomotor,neurologico,pielyFaneras } = req.body;
+        const { cabeza,cuello,torax,abdomen,ginecoUrinario,locomotor,neurologico,pielyFaneras } = req.body;
         const { id_paciente,id_medico } = req.params;         
         const verifyMEdico = await validateMedico(id_medico);
         if(verifyMEdico.success == false) return res.status(200).json(verifyMEdico);
@@ -19,8 +19,6 @@ class ExamenFisico{
                 cabeza,
                 cuello,
                 torax,
-                pulmones,
-                corazon,
                 abdomen,
                 ginecoUrinario,
                 locomotor,
@@ -52,8 +50,6 @@ class ExamenFisico{
                     'cabeza',
                     'cuello',
                     'torax',
-                    'pulmones',
-                    'corazon',
                     'abdomen',
                     'ginecoUrinario',
                     'locomotor',
@@ -81,7 +77,7 @@ class ExamenFisico{
         try {
             const resp = await examenFisico.findOne({
                 where:{id:id_examenFisico},
-                attributes:['id','cabeza','cuello','torax','pulmones','corazon','abdomen','ginecoUrinario','locomotor','neurologico','pielyFaneras','createdAt']
+                attributes:['id','cabeza','cuello','torax','abdomen','ginecoUrinario','locomotor','neurologico','pielyFaneras','createdAt']
             });
             if(resp){
                 res.status(200).json({

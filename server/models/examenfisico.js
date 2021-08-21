@@ -9,12 +9,6 @@ module.exports = (sequelize, DataTypes) => {
     torax: {
       type: DataTypes.TEXT      
     },
-    pulmones: {
-      type: DataTypes.TEXT      
-    },
-    corazon: {
-      type: DataTypes.TEXT      
-    },
     abdomen: {
       type: DataTypes.TEXT      
     },

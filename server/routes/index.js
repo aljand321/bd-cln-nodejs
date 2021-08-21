@@ -12,6 +12,34 @@ import ExamenFisico from "../controllers/exmFisico";
 import AntGinecoObst from "../controllers/AntcGinecoObst";
 import Vacunas from "../controllers/Vacunas";
 import AntPediatricos from '../controllers/AntPedriaticos';
+import ArchivosPacientes from '../controllers/ArchivosPaciente';
+
+// para guardar los archivos
+
+import multer from 'multer';
+import path from 'path';
+const monent = Date.now();
+const date = new Date(monent)
+console.log(date)
+function radom_function (){
+  const letra = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u',
+                  'v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+                  'Q','R','S','T','U','V','W','X','Y','Z']
+  var ramdomL = []
+  for (var i = 0; i < 6; i++){
+      ramdomL.push(letra[Math.floor(Math.random() * letra.length)])       
+  }    
+  return ramdomL[0]+ramdomL[1]+ramdomL[2]+ramdomL[3]+ramdomL[4]+ramdomL[5]    
+}
+const storageA = multer.diskStorage({
+  destination: path.join(__dirname,'../uploads'),
+  filename: (req, file, cb) => {
+      cb(null,radom_function()+'-'+radom_function()+'-name-'+file.originalname)
+  }
+});
+const destA = multer({ storage : storageA})
+//fin de guradar archivos
+
 export default (app) => {
   app.get("/api", (req, res) =>
     res.status(200).send({
@@ -122,6 +150,10 @@ export default (app) => {
   app.post('/api/createAntPedriaticos/:id_medico/:id_paciente', AntPediatricos.create);
   app.get('/api/antPediatricos/:id_paciente/:id_medico',AntPediatricos.lisAntPediatricos)
 
+  //archivos del paciente
+  app.post('/api/archivos/:id_paciente/:id_medico', destA.single('files'), ArchivosPacientes.create);
+  app.get('/api/listArchivosPaciente/:id_paciente',ArchivosPacientes.listArchivosPaciente);
+
 };
 
 //sequelize model:create --name peronal --attributes nombre:string,apellidos:string,ci:string,telefono:integer,direccion:string,edad:date,img:string,profecion:string,especialidad:string,fechaDeContrato:string
@@ -158,6 +190,8 @@ export default (app) => {
 
 //antecedentes pedriatricos
 //sequelize model:create --name antPediatricos --attributes pesoRn:string,tipodeParto:string,obsPerinatales:string,id_paciente:integer,id_medico:integer
+
+// sequelize model:create --name archivosPaciente --attributes descripcion:text,archivo:string,id_paciente:integer,id_medico:integer
 
 
 

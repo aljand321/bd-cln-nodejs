@@ -100,6 +100,9 @@ module.exports = (sequelize, DataTypes) => {
     medicoUser.hasMany(models.antPediatricos, {
       foreignKey: 'id_medico',
     });
+    medicoUser.hasMany(models.archivosPaciente, {
+      foreignKey: 'id_medico',
+    });
   };
   return medicoUser;
 };

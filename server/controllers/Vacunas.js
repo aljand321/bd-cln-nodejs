@@ -66,6 +66,8 @@ class Vacunas {
         const {id_paciente,id_medico}= req.params;
         const verifyPaciente = await validatePaciente(id_paciente);
         if(verifyPaciente.success == false) return res.status(200).json(verifyPaciente);
+        const vacunas = await allVacunas();
+        
         try {
             const resp = await sq.sequelize.query(`
             select TP.id, TVP.id_vacuna,TVP.id_medico,TVP.description,TVP.fecha "fechaVacuanPaciente", TV.nombre "vacuna",TV.descripcion "VacunaDescripcion",TM.nombres "medico"
@@ -76,6 +78,12 @@ class Vacunas {
                 //console.log(data.id_medico)
                 return data.id_medico == id_medico;
             })
+            /* let arr = [];
+            for(let i = 0; i < resp[0].length; i ++){
+                arr.push({
+                    id:
+                })
+            } */
             res.status(200).json({
                 success:true,
                 msg:"Lista de vacunas del paciente",
@@ -306,6 +314,14 @@ async function all(buscador){
     } catch (error) {
         console.log(error, ' sssssssssssssss44444444444444445555555555555555555555555555666666666666666')
         return {success:false, msg:"erro 500"}
+    }
+}
+async function allVacunas (){
+    try {
+        const resp = await vacunas.findAll()
+        return {success:true,msg:'lista de vacunas',resp}
+    } catch (error) {
+        return {success:false,msg:'error 500'}
     }
 }
 export default Vacunas;

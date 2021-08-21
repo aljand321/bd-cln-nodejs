@@ -1,6 +1,8 @@
 //import http from 'http';
 import express from "express";
 import morgan from "morgan";
+import path from 'path';
+//import multer from 'multer';
 import routes from "./routes";
 var cors = require("cors");
 
@@ -15,7 +17,9 @@ app.use(morgan("dev")); // log requests to the console
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+const publicDirectoryPath = path.join(__dirname, 'uploads');
 
+app.use(express.static(publicDirectoryPath));
 //auth token
 //app.use(Authtoken);
 routes(app);

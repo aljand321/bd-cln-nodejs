@@ -17,12 +17,6 @@ module.exports = {
       torax: {
         type: Sequelize.TEXT
       },
-      pulmones: {
-        type: Sequelize.TEXT
-      },
-      corazon: {
-        type: Sequelize.TEXT
-      },
       abdomen: {
         type: Sequelize.TEXT
       },
